@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 import org.riskfirst.Article;
 import org.riskfirst.ArticleLoader;
 
-import twitter4j.ResponseList;
-import twitter4j.SavedSearch;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
@@ -24,9 +22,9 @@ public class Tweeter {
 
 	public static void main(String[] args) throws Exception {
 		props.load(new FileReader(new File("tweeter.properties")));
-		riskFirstWikiDir = props.getProperty("dir", "../website.wiki");
+		riskFirstWikiDir = props.getProperty("dir", "../website");
 		
-		URI baseURI = new URI(props.getProperty("baseURI", "https://github.com/risk-first/website/wiki/"));
+		URI baseURI = new URI(props.getProperty("baseURI", "https://riskfirst.org/"));
 		
 		System.out.println("baseURI: "+baseURI);
 
@@ -44,11 +42,11 @@ public class Tweeter {
 		collectTweets(baseURI, tweetsArticle, potentialTweets, amount("tweets", 3), tags);
 
 		RetweetSource followerSource = new FollowerRetweetSource(twitter);
-		retweets = followerSource.getRandomTweets(amount("follow", 2));
+		retweets = followerSource.getRandomTweets(amount("follow", amount("follow", 2)));
 		potentialRetweets.addAll(retweets);
 
 		RetweetSource searchSource = new SavedSearchRetweetSource(twitter);
-		retweets = searchSource.getRandomTweets(amount("searches", 4));
+		retweets = searchSource.getRandomTweets(amount("searches", amount("search", 2)));
 		potentialRetweets.addAll(retweets);
 		
 		for (StatusUpdate statusUpdate : potentialTweets) {
@@ -59,7 +57,7 @@ public class Tweeter {
 				System.err.println("Couldn't tweet: "+statusUpdate);
 				e.printStackTrace();
 			}
-			Thread.sleep(1000);
+			Thread.sleep(amount("delay", 1000));
 		}	
 		
 		for (Long l : potentialRetweets) {
@@ -70,7 +68,7 @@ public class Tweeter {
 				System.err.println("Couldn't re-tweet: "+l);
 				e.printStackTrace();
 			}
-			Thread.sleep(1000);
+			Thread.sleep(amount("delay", 1000));
 		}	
 	}
 
@@ -86,6 +84,10 @@ public class Tweeter {
 		
 		TweetSource articleTweetSource = new ArticleTweetSource(articles, baseURI, tags);
 		tweets = articleTweetSource.getRandomTweets(count);
+		potentialTweets.addAll(tweets);
+		
+		TweetSource quoteTweetSource = new  QuoteTweetSource(articles, baseURI, tags);
+		tweets = quoteTweetSource.getRandomTweets(count);
 		potentialTweets.addAll(tweets);
 	}
 

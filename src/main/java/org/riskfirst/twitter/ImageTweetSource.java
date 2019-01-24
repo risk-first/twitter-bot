@@ -23,7 +23,7 @@ public class ImageTweetSource extends AbstractRiskFirstWikiTweetSource implement
 
 	@Override
 	public List<StatusUpdate> getAllTweets() {
-		return getArticlesInState(EnumSet.of(ArticleState.FOR_REVIEW, ArticleState.REVIEWED)).stream()
+		return getArticlesInState(EnumSet.of(ArticleState.FOR_REVIEW, ArticleState.REVIEWED, ArticleState.NONE)).stream()
 			.flatMap(a -> getImagesFromArticle(a).stream())
 			.filter(l -> !l.isExternal())
 			.filter(l -> l.isImage())
@@ -34,8 +34,7 @@ public class ImageTweetSource extends AbstractRiskFirstWikiTweetSource implement
 	
 	private StatusUpdate convertToStatusUpdate(Link l) {
 		String articleUrl = l.getArticle().getUrl(baseUri.toString());
-		StatusUpdate out = new StatusUpdate("\""+ l.getText()+"\" "+suffix(4)+"- from "+articleUrl+" ");
-		
+		StatusUpdate out = new StatusUpdate("\""+ stripMarkdown(l.getText())+"\" "+suffix(4)+"- from "+articleUrl+" ");
 		out.setMedia(getImageFile(l.getUrl()));
 		return out;
 	}
@@ -43,7 +42,7 @@ public class ImageTweetSource extends AbstractRiskFirstWikiTweetSource implement
 	private File getImageFile(String url) {
 		File out = new File(riskFirstWikiDir+"/"+url);
 		if (!out.exists()) {
-			throw new RuntimeException("Image not found");
+			throw new RuntimeException("Image not found: "+out.toString());
 		}
 		return out;
 	}

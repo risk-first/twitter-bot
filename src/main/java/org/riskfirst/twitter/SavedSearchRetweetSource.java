@@ -8,6 +8,7 @@ import twitter4j.Query;
 import twitter4j.QueryResult;
 import twitter4j.ResponseList;
 import twitter4j.SavedSearch;
+import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
@@ -27,8 +28,10 @@ public class SavedSearchRetweetSource extends AbstractRetweetSource {
 			
 			for (SavedSearch ss : searches) {
 				System.out.println("Saved Search: "+ss);
-				QueryResult qr = t.search(new Query(ss.getQuery()));
-				qr.getTweets().stream().map(s -> s.getId()).forEach(id -> out.add(id));
+				Query query = new Query(ss.getQuery());
+				query.setCount(60);
+				QueryResult qr = t.search(query);
+				qr.getTweets().stream().map(s -> getId(s)).forEach(id -> out.add(id));
 			}
 			
 			return out;
@@ -36,6 +39,11 @@ public class SavedSearchRetweetSource extends AbstractRetweetSource {
 			e.printStackTrace();
 			return Collections.emptyList();
 		}
+	}
+
+	public long getId(Status s) {
+		System.out.println("SS: "+s.getText());
+		return s.getId();
 	}
 
 }

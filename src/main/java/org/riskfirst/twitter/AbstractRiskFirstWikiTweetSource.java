@@ -2,7 +2,6 @@ package org.riskfirst.twitter;
 
 import java.net.URI;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -33,5 +32,9 @@ public abstract class AbstractRiskFirstWikiTweetSource extends AbstractTweetSour
 //		Collections.shuffle(hashtags);
 //		List<String> sl = hashtags.subList(0, Math.min(c, hashtags.size()-1));
 //		return " "+sl.stream().reduce((a, b) -> a+" "+b).orElse("");
+	}
+	
+	public String stripMarkdown(String in) {
+		return in.replace("**","").replace("_", "").replaceAll("<!--.*?-->","");
 	}
 }
