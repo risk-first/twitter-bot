@@ -2,9 +2,11 @@ package org.riskfirst.twitter;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.riskfirst.Article;
+import org.riskfirst.ArticleState;
 
 import twitter4j.StatusUpdate;
 
@@ -17,27 +19,14 @@ public class ArticleTweetSource extends AbstractRiskFirstWikiTweetSource {
 	@Override
 	public List<StatusUpdate> getAllTweets() {
 		List<StatusUpdate> out = new ArrayList<>();
-		articles.stream().forEach(a -> getTweetsFor(a, out));
+		getArticlesInState(EnumSet.of(ArticleState.REVIEWED)).stream().forEach(a -> getTweetsFor(a, out));
 		return out;
 	}
 
 	public void getTweetsFor(Article a, List<StatusUpdate> out) {
-		String text = a.getText();
-		String[] lines = text.split("\\r?\\n");
-		
-		for (String string : lines) {
-			int e = string.indexOf("<!-- tweet-end -->");
-			if (e > -1) {
-				string = string.substring(0, e);
-				int s = string.indexOf("<!-- tweet-start -->");
-				if (s > -1) {
-					string = string.substring(s+20);
-				}
-				StatusUpdate su = new StatusUpdate(deMarkdown(string, a) + " - from "+a.getUrl(baseUri.toString()));
-				System.out.println("Potential tweet: "+su);
-				out.add(su);
-			}
-		}
+		StatusUpdate su = new StatusUpdate(a.getUrl(baseUri.toString())+suffix());
+		System.out.println("Potential tweet: "+su);
+		out.add(su);
 	}
 	
 	public String deMarkdown(String text, Article a) {
@@ -46,6 +35,6 @@ public class ArticleTweetSource extends AbstractRiskFirstWikiTweetSource {
 				link -> sb.append(link.getText()), 
 				t ->sb.append(t), a);
 		 
-		return stripMarkdown(sb.toString())+suffix(2);
+		return stripMarkdown(sb.toString())+suffix();
 	}
 }

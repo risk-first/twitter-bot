@@ -60,6 +60,9 @@ public class ArticleLoader {
 			return ArticleState.FOR_REVIEW;
 		} else if (contents.contains("state/reviewed.png")) {
 			return ArticleState.REVIEWED;
+		} else if (contents.contains("---")) {
+			// this means meta data is set, the article is published.
+			return ArticleState.REVIEWED;
 		} else {
 			return ArticleState.NONE;
 		}

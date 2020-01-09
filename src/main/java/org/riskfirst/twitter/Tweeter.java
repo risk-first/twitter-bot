@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.riskfirst.Article;
 import org.riskfirst.ArticleLoader;
+import org.riskfirst.twitter.unused.FollowerRetweetSource;
+import org.riskfirst.twitter.unused.SavedSearchRetweetSource;
 
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
@@ -31,15 +34,15 @@ public class Tweeter {
 		Twitter twitter = TwitterFactory.getSingleton();
 		List<Article> allArticles = new ArticleLoader().loadArticles(riskFirstWikiDir);
 		List<Article> articles = allArticles.stream().filter(a -> !tweetsArticle(a)).collect(Collectors.toList());
-		List<Article> tweetsArticle = allArticles.stream().filter(a -> tweetsArticle(a)).collect(Collectors.toList());
-		List<String> tags = twitter.getSavedSearches().stream().map(ss -> ss.getQuery()).collect(Collectors.toList());
+		List<String> tags = Arrays.asList(props.getProperty("tags").split(","));
+		
+		System.out.println("Tags in play: "+tags);
 		
 		List<StatusUpdate> potentialTweets = new ArrayList<>();
 		List<Long> retweets;
 		List<Long> potentialRetweets = new ArrayList<>();
 		
-		collectTweets(baseURI, articles, potentialTweets, amount("articles", 3), tags);
-		collectTweets(baseURI, tweetsArticle, potentialTweets, amount("tweets", 3), tags);
+		collectTweets(baseURI, articles, potentialTweets, tags);
 
 		RetweetSource followerSource = new FollowerRetweetSource(twitter);
 		retweets = followerSource.getRandomTweets(amount("follow", amount("follow", 2)));
@@ -76,18 +79,18 @@ public class Tweeter {
 		return Integer.parseInt(props.getProperty(prop, ""+i));
 	}
 
-	public static void collectTweets(URI baseURI, List<Article> articles, List<StatusUpdate> potentialTweets, int count, List<String> tags) {
+	public static void collectTweets(URI baseURI, List<Article> articles, List<StatusUpdate> potentialTweets, List<String> tags) {
 		List<StatusUpdate> tweets;
 		TweetSource imageTweetSource = new ImageTweetSource(articles, baseURI, riskFirstWikiDir, tags);
-		tweets = imageTweetSource.getRandomTweets(count);
+		tweets = imageTweetSource.getRandomTweets(amount("images", 1));
 		potentialTweets.addAll(tweets);
 		
 		TweetSource articleTweetSource = new ArticleTweetSource(articles, baseURI, tags);
-		tweets = articleTweetSource.getRandomTweets(count);
+		tweets = articleTweetSource.getRandomTweets(amount("articles", 1));
 		potentialTweets.addAll(tweets);
 		
-		TweetSource quoteTweetSource = new  QuoteTweetSource(articles, baseURI, tags);
-		tweets = quoteTweetSource.getRandomTweets(count);
+		TweetSource quoteTweetSource = new  QuoteTweetSource(articles, baseURI, tags, riskFirstWikiDir, "/images/generated/quotes");
+		tweets = quoteTweetSource.getRandomTweets(amount("quotes", 1));
 		potentialTweets.addAll(tweets);
 	}
 

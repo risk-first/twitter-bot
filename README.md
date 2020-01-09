@@ -1,4 +1,4 @@
-Tweets quotes, images, etc. from the risk first project.
+Tweets quotes, images, etc. from the Risk-First project.
 
 ### Deploying
 

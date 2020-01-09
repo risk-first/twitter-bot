@@ -1,47 +1,50 @@
 package org.riskfirst.twitter;
 
+import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.riskfirst.Article;
-import org.riskfirst.Link;
 
 import twitter4j.StatusUpdate;
 
+/**
+ * Now uses quotes held in images.
+ */
 public class QuoteTweetSource extends AbstractRiskFirstWikiTweetSource {
 	
-	public QuoteTweetSource(List<Article> articles, URI baseUri, List<String> tags) {
+	private String quoteDir;
+	private String riskFirstBaseDir;
+	
+	public QuoteTweetSource(List<Article> articles, URI baseUri, List<String> tags, String riskFirstBaseDir, String quoteDir) {
 		super(articles, baseUri, tags);
+		this.quoteDir = quoteDir;
+		this.riskFirstBaseDir = riskFirstBaseDir;
 	}
 	
 	@Override
 	public List<StatusUpdate> getAllTweets() {
-		List<StatusUpdate> out = new ArrayList<>();
-		articles.stream().forEach(a -> getTweetsFor(a, out));
-		return out;
+		File f = new File(riskFirstBaseDir+quoteDir);
+		
+		return Arrays.stream(f.listFiles())
+				.filter(ff -> ff.getName().endsWith("png"))
+				.map(ff -> {
+			String articleUrl = createArticleUrl(ff);
+			StatusUpdate out = new StatusUpdate("from "+articleUrl+" "+suffix());
+			out.setMedia(ff);
+			System.out.println("Potential Tweet:"+out);
+			return out;
+			
+		}).collect(Collectors.toList());
+		
 	}
 
-	public void getTweetsFor(Article a, List<StatusUpdate> out) {
-		String text = a.getText();
-		String[] lines = text.split("\\r?\\n");
-		
-		for (String string : lines) {
-			if (string.startsWith(">")) {
-				string = string.substring(1);
-				StatusUpdate su = new StatusUpdate(""+deMarkdown(string, a) + " - from "+a.getUrl(baseUri.toString()));
-				System.out.println("Potential tweet: "+su);
-				out.add(su);
-			}
-		}
-	}
-	
-	public String deMarkdown(String text, Article a) {
-		StringBuilder sb = new StringBuilder();
-		Article.processLine(text, 0, 
-				link -> link.getText(), 
-				t ->sb.append(t), a);
-		 
-		return stripMarkdown(sb.toString())+suffix(2);
+	private String createArticleUrl(File ff) {
+		String name = ff.getName();
+		int us = name.lastIndexOf("_");
+		String article = name.substring(0, us);
+		return baseUri + article;
 	}
 }

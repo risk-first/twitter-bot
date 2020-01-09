@@ -1,8 +1,10 @@
-package org.riskfirst.twitter;
+package org.riskfirst.twitter.unused;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.riskfirst.twitter.AbstractRetweetSource;
 
 import twitter4j.Paging;
 import twitter4j.ResponseList;
