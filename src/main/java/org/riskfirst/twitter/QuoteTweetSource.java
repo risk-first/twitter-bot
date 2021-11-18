@@ -16,17 +16,17 @@ import twitter4j.StatusUpdate;
 public class QuoteTweetSource extends AbstractRiskFirstWikiTweetSource {
 	
 	private String quoteDir;
-	private String riskFirstBaseDir;
 	
 	public QuoteTweetSource(List<Article> articles, URI baseUri, List<String> tags, String riskFirstBaseDir, String quoteDir) {
-		super(articles, baseUri, tags);
+		super(articles, baseUri, tags, riskFirstBaseDir);
 		this.quoteDir = quoteDir;
-		this.riskFirstBaseDir = riskFirstBaseDir;
 	}
 	
 	@Override
 	public List<StatusUpdate> getAllTweets() {
-		File f = new File(riskFirstBaseDir+quoteDir);
+		File f = new File(riskFirstWikiDir+quoteDir);
+		
+		System.out.println("getting quote tweets: "+f);
 		
 		return Arrays.stream(f.listFiles())
 				.filter(ff -> ff.getName().endsWith("png"))

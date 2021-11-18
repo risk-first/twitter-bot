@@ -85,7 +85,7 @@ public class Tweeter {
 		tweets = imageTweetSource.getRandomTweets(amount("images", 1));
 		potentialTweets.addAll(tweets);
 		
-		TweetSource articleTweetSource = new ArticleTweetSource(articles, baseURI, tags);
+		TweetSource articleTweetSource = new ArticleTweetSource(articles, baseURI, tags, riskFirstWikiDir);
 		tweets = articleTweetSource.getRandomTweets(amount("articles", 1));
 		potentialTweets.addAll(tweets);
 		

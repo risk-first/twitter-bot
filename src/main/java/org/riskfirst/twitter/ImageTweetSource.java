@@ -1,6 +1,7 @@
 package org.riskfirst.twitter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.EnumSet;
 import java.util.List;
@@ -14,11 +15,8 @@ import twitter4j.StatusUpdate;
 
 public class ImageTweetSource extends AbstractRiskFirstWikiTweetSource implements TweetSource {
 		
-	private String riskFirstWikiDir;
-
 	public ImageTweetSource(List<Article> articles, URI baseUri, String riskFirstWikiDir, List<String> hashtags) {
-		super(articles, baseUri, hashtags);
-		this.riskFirstWikiDir = riskFirstWikiDir;
+		super(articles, baseUri, hashtags, riskFirstWikiDir);
 	}
 
 	@Override
@@ -29,20 +27,36 @@ public class ImageTweetSource extends AbstractRiskFirstWikiTweetSource implement
 			.filter(l -> l.isImage())
 			.filter(l -> !l.getUrl().contains("/state/"))
 			.map(l -> convertToStatusUpdate(l))
+			.filter(l -> l != null)
 			.collect(Collectors.toList());
 	}
 	
 	private StatusUpdate convertToStatusUpdate(Link l) {
-		String articleUrl = l.getArticle().getUrl(baseUri.toString());
-		StatusUpdate out = new StatusUpdate("\""+ stripMarkdown(l.getText())+"\" "+suffix()+"- from "+articleUrl+" ");
-		out.setMedia(getImageFile(l.getUrl()));
-		return out;
+		try {
+			String articleUrl = l.getArticle().getUrl(baseUri.toString(), riskFirstWikiDir);
+			StatusUpdate out = new StatusUpdate("\""+ stripMarkdown(l.getText())+"\" "+suffix()+"- from "+articleUrl+" ");
+			out.setMedia(getImageFile(articleUrl, l.getUrl()));
+			return out;
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return null;
+		}
 	}
 	
-	private File getImageFile(String url) {
-		File out = new File(riskFirstWikiDir+"/"+url);
+	private File getImageFile(String articleUrl, String imageUrl) throws FileNotFoundException {
+		File out;
+		try {
+			URI uri = new URI(articleUrl);
+			
+			out = new File(riskFirstWikiDir, uri.getPath());
+			out = new File(out, imageUrl);
+			out = out.getCanonicalFile();
+		} catch (Exception e) {
+			throw new FileNotFoundException("Couldn't find: "+ e.getMessage());
+		}
+		
 		if (!out.exists()) {
-			throw new RuntimeException("Image not found: "+out.toString());
+			throw new FileNotFoundException("Image not found: "+out.toString());
 		}
 		return out;
 	}

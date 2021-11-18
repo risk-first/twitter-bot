@@ -100,8 +100,8 @@ public class Article {
 		return "Article [state=" + state + ", f=" + f + "]";
 	}
 	
-	public String getUrl(String baseUri) {
-		return baseUri+f.getName().replace(".md", "");
+	public String getUrl(String baseUri, String homeDir) throws IOException {
+		return baseUri+this.f.getPath().substring(homeDir.length()+1).replace(".md", "");
 	}
 	
 }

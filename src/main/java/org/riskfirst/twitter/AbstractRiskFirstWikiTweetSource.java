@@ -16,11 +16,13 @@ public abstract class AbstractRiskFirstWikiTweetSource extends AbstractTweetSour
 	protected List<Article> articles;
 	protected URI baseUri;
 	protected List<String> hashtags;
-	
-	public AbstractRiskFirstWikiTweetSource(List<Article> articles, URI baseUri, List<String> hashtags) {
+	protected String riskFirstWikiDir;
+
+	public AbstractRiskFirstWikiTweetSource(List<Article> articles, URI baseUri, List<String> hashtags, String riskFirstWikiDir) {
 		this.baseUri = baseUri;
 		this.articles = articles;
 		this.hashtags = hashtags;
+		this.riskFirstWikiDir = riskFirstWikiDir;
 	}
 
 	public List<Article> getArticlesInState(EnumSet<ArticleState> states) {

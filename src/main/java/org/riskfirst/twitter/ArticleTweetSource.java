@@ -1,5 +1,6 @@
 package org.riskfirst.twitter;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -12,8 +13,8 @@ import twitter4j.StatusUpdate;
 
 public class ArticleTweetSource extends AbstractRiskFirstWikiTweetSource {
 	
-	public ArticleTweetSource(List<Article> articles, URI baseUri, List<String> tags) {
-		super(articles, baseUri, tags);
+	public ArticleTweetSource(List<Article> articles, URI baseUri, List<String> tags, String riskFirstWikiDir) {
+		super(articles, baseUri, tags, riskFirstWikiDir);
 	}
 	
 	@Override
@@ -24,9 +25,13 @@ public class ArticleTweetSource extends AbstractRiskFirstWikiTweetSource {
 	}
 
 	public void getTweetsFor(Article a, List<StatusUpdate> out) {
-		StatusUpdate su = new StatusUpdate(a.getUrl(baseUri.toString())+suffix());
-		System.out.println("Potential tweet: "+su);
-		out.add(su);
+		try {
+			StatusUpdate su = new StatusUpdate(a.getUrl(baseUri.toString(), riskFirstWikiDir)+suffix());
+			System.out.println("Potential tweet: "+su);
+			out.add(su);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public String deMarkdown(String text, Article a) {

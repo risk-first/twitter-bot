@@ -6,7 +6,7 @@ Locally:
 
 ```
 mvn assembly:assembly
-scp target/twitter-bot-0.1-SNAPSHOT-jar-with-dependencies.jar deploy@server.kite9.org:~/risk-first
+scp target/twitter-bot-0.1-SNAPSHOT-jar-with-dependencies.jar deploy@automation.riskfirst.org:~
 ```
 
 On Box:
