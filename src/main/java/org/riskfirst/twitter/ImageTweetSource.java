@@ -21,7 +21,7 @@ public class ImageTweetSource extends AbstractRiskFirstWikiTweetSource implement
 
 	@Override
 	public List<StatusUpdate> getAllTweets() {
-		return getArticlesInState(EnumSet.of(ArticleState.FOR_REVIEW, ArticleState.REVIEWED, ArticleState.NONE)).stream()
+		return getArticlesInState(EnumSet.of(ArticleState.TWEETABLE)).stream()
 			.flatMap(a -> getImagesFromArticle(a).stream())
 			.filter(l -> !l.isExternal())
 			.filter(l -> l.isImage())
@@ -33,7 +33,7 @@ public class ImageTweetSource extends AbstractRiskFirstWikiTweetSource implement
 	
 	private StatusUpdate convertToStatusUpdate(Link l) {
 		try {
-			String articleUrl = l.getArticle().getUrl(baseUri.toString(), riskFirstWikiDir);
+			String articleUrl = getArticleUrl(l.getArticle());
 			StatusUpdate out = new StatusUpdate("\""+ stripMarkdown(l.getText())+"\" "+suffix()+"- from "+articleUrl+" ");
 			out.setMedia(getImageFile(articleUrl, l.getUrl()));
 			return out;
@@ -41,24 +41,6 @@ public class ImageTweetSource extends AbstractRiskFirstWikiTweetSource implement
 			System.err.println(e.getMessage());
 			return null;
 		}
-	}
-	
-	private File getImageFile(String articleUrl, String imageUrl) throws FileNotFoundException {
-		File out;
-		try {
-			URI uri = new URI(articleUrl);
-			
-			out = new File(riskFirstWikiDir, uri.getPath());
-			out = new File(out, imageUrl);
-			out = out.getCanonicalFile();
-		} catch (Exception e) {
-			throw new FileNotFoundException("Couldn't find: "+ e.getMessage());
-		}
-		
-		if (!out.exists()) {
-			throw new FileNotFoundException("Image not found: "+out.toString());
-		}
-		return out;
 	}
 
 	public List<Link> getImagesFromArticle(Article a) {

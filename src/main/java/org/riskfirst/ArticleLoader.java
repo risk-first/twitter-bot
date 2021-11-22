@@ -30,8 +30,7 @@ public class ArticleLoader {
 		} else if (f.getName().endsWith(".md")) {
 			String contents = toString(new FileInputStream(f));
 			ArticleState as = getStateFor(contents);
-			
-			Article art = new Article(as, contents, f);
+			Article art = new Article(as, f);
 			out.add(art);
 			System.out.println("Loaded: "+art);
 			
@@ -51,20 +50,10 @@ public class ArticleLoader {
 	}
 
 	private ArticleState getStateFor(String contents) {
-		contents = contents.substring(0, contents.indexOf('\n')+1);
-		if (contents.contains("state/uc.png")) {
-			return ArticleState.UNDER_CONSTRUCTION;
-		} else if (contents.contains("state/draft.png")) {
-			return ArticleState.DRAFT;
-		} else if (contents.contains("state/for-review.png")) {
-			return ArticleState.FOR_REVIEW;
-		} else if (contents.contains("state/reviewed.png")) {
-			return ArticleState.REVIEWED;
-		} else if (contents.contains("---")) {
-			// this means meta data is set, the article is published.
-			return ArticleState.REVIEWED;
+		if (contents.contains("tweet: yes")) {
+			return ArticleState.TWEETABLE;
 		} else {
-			return ArticleState.NONE;
+			return ArticleState.NOT_TWEETABLE;
 		}
 	}
 	
