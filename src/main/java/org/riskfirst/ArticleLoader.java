@@ -37,7 +37,7 @@ public class ArticleLoader {
 		}
 	}
 	
-	private String toString(InputStream inputStream) throws IOException {
+	public static String toString(InputStream inputStream) throws IOException {
 		BufferedInputStream bis = new BufferedInputStream(inputStream);
 		ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		int result = bis.read();

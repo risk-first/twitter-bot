@@ -69,9 +69,6 @@ public class Article {
 	public void processLine(String line, int number) {
 		Matcher linkMatcher = LINK_PATTERN.matcher(line);
 		while (linkMatcher.find()) {
-			int s = linkMatcher.start();
-			int e = linkMatcher.end();
-			String link = line.substring(s, e);
 			String bang = linkMatcher.group(1);
 			String text = linkMatcher.group(2);
 			String url = linkMatcher.group(3);
@@ -80,12 +77,17 @@ public class Article {
 		
 		if (line.startsWith(">") && (line.indexOf("- [") > -1)) {
 			// it's a quote
-			String quoteLink = this.f.getPath()
-				.replace("../website", "/images/generated/quotes")
-				.replace(".md", "-"+quotes.size()+".png");
+			String quoteLink = createQuoteFilePath(this.f, quotes.size());
 			quotes.add(new Link(true, "", quoteLink, number, this));
 		}
 		
+	}
+
+	public static String createQuoteFilePath(File f, int i) {
+		String quoteLink = f.getPath()
+			.replace("../website", "/images/generated/quotes")
+			.replace(".md", "-"+i+".png");
+		return quoteLink;
 	}
 
 	@Override

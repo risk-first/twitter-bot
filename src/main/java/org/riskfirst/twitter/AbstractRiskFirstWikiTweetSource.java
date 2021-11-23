@@ -38,7 +38,7 @@ public abstract class AbstractRiskFirstWikiTweetSource extends AbstractTweetSour
 		return a.getUrl(baseUri.toString(), riskFirstWikiDir);
 	}
 	
-	protected File getImageFile(String articleUrl, String imageUrl) throws FileNotFoundException {
+	public static File getImageFile(String riskFirstWikiDir, String articleUrl, String imageUrl) throws FileNotFoundException {
 		File out;
 		try {
 			if (imageUrl.startsWith("/")) {

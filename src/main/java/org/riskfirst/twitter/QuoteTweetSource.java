@@ -35,7 +35,7 @@ public class QuoteTweetSource extends AbstractRiskFirstWikiTweetSource {
 		try {
 			String articleUrl = getArticleUrl(l.getArticle());
 			StatusUpdate out = new StatusUpdate("From "+articleUrl+" "+suffix());
-			out.setMedia(getImageFile(articleUrl, l.getUrl()));
+			out.setMedia(getImageFile(riskFirstWikiDir, articleUrl, l.getUrl()));
 			return out;
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
