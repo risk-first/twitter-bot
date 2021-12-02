@@ -15,15 +15,17 @@ public class Article {
 	private final File f;
 	private transient List<Link> links;
 	private transient List<Link> quotes;
+	private final String dir;
 	
 	public File getFile() {
 		return f;
 	}
 
-	public Article(ArticleState state, File f) {
+	public Article(ArticleState state, File f, String dir) {
 		super();
 		this.state = state;
 		this.f = f;
+		this.dir = dir;
 	}
 
 	public ArticleState getState() {
@@ -77,15 +79,15 @@ public class Article {
 		
 		if (line.startsWith(">") && (line.indexOf("- [") > -1)) {
 			// it's a quote
-			String quoteLink = createQuoteFilePath(this.f, quotes.size());
+			String quoteLink = createQuoteFilePath(this.f, quotes.size(), dir);
 			quotes.add(new Link(true, "", quoteLink, number, this));
 		}
 		
 	}
 
-	public static String createQuoteFilePath(File f, int i) {
+	public static String createQuoteFilePath(File f, int i, String dir) {
 		String quoteLink = f.getPath()
-			.replace("../website", "/images/generated/quotes")
+			.replace(dir, "/images/generated/quotes")
 			.replace(".md", "-"+i+".png");
 		return quoteLink;
 	}

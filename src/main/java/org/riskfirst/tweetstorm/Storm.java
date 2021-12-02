@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -40,6 +40,10 @@ import org.riskfirst.Article;
 import org.riskfirst.ArticleLoader;
 import org.riskfirst.twitter.ImageTweetSource;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
@@ -51,22 +55,51 @@ public class Storm {
     
     static String riskFirstWikiDir = "../website";
 
-	
-	public static final Object END = new Object();
+    public static final Object END = new Object() {
+
+		@Override
+		public String toString() {
+			return "END";
+		}  	
+    	
+    };
+    
+    public static final Object BULLET = new Object() {
+
+		@Override
+		public String toString() {
+			return "BULLET";
+		}  	
+    	
+    };
 	
 	public static final int MAX_CHARS = 200;
+	public static final int MAX_CHARS_OUT = 270;
 	
 	URI imageUrl;
 	URI pageUrl;
 	List<TweetStructure> tweets = new ArrayList<>();
 	List<String> tags;
 	File f;
+	String description;
+	String title;
+	int nextNumber = 1;
 	
 	Set<Object> alreadyLinked = new HashSet<>();
 	
 	enum Mode { NORMAL, BULLETS, SKIP, ORDERED }
 	
 	static final Pattern END_OF_SENTENCE = Pattern.compile("[\\.\\!\\?]\\ [\\ ]*");
+	
+	private void processYaml(String yaml) throws Exception {
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+		TypeReference<Map<String, Object>> tr = new TypeReference<Map<String,Object>>() {};
+		Map<String, Object> values = mapper.readValue(yaml, tr);
+		
+		title = (String) values.get("title");
+		description = (String) values.get("description");
+	}
+	
 	
 	public Storm(String fileName, String url, List<String> tags) throws Exception {
 		this.tags = tags;
@@ -80,15 +113,20 @@ public class Storm {
 		
 		String s = ArticleLoader.toString(new FileInputStream(f));
 		
+		List<Object> stuff = new ArrayList<>();
+		StringBuilder sb = new StringBuilder();
+		
 		if (s.startsWith("---\n")) {
 			// remove meta
-			s = s.substring(s.lastIndexOf("---\n"));
+			s = s.substring(4);
+			int yamlEnd = s.lastIndexOf("---\n");
+			processYaml(s.substring(0, yamlEnd));
+			s = s.substring(yamlEnd+4);
+			stuff.add(description);
 		}
 		
 		Document d = (Document) parser.parse(s);
 
-		List<Object> stuff = new ArrayList<>();
-		StringBuilder sb = new StringBuilder();
 		
 		d.accept(new AbstractVisitor() {
 			
@@ -111,16 +149,7 @@ public class Storm {
 						lastMatch = full.length();
 					}
 					if (sen.length() > 0) {
-						switch (mode.peek()) {
-						case BULLETS:
-						case ORDERED:
-							stuff.add("- "+ sen);
-							break;
-						case NORMAL:
-							stuff.add(sen);
-						case SKIP:
-						}
-						
+						stuff.add(sen);
 					} else {
 						return;
 					}
@@ -143,6 +172,9 @@ public class Storm {
 
 			@Override
 			public void visit(Code code) {
+				sb.append("[");
+				sb.append(code.getLiteral());
+				sb.append("]");
 			}
 
 			@Override
@@ -161,7 +193,6 @@ public class Storm {
 			@Override
 			public void visit(Heading heading) {
 				if (heading.getLevel() == 1) {
-					super.visit(heading);
 					stuff.add(new Link(pageUrl.toString(), ""));
 					emptyBuffer();
 					stuff.add(END);
@@ -180,7 +211,8 @@ public class Storm {
 			@Override
 			public void visit(Link link) {
 				if ((!link.getDestination().toLowerCase().contains("glossary")) &&
-				 (alreadyLinked.add(link.getDestination()))) {
+				 (alreadyLinked.add(link.getDestination())) && (!link.getDestination().contains("#"))) {
+					emptyBuffer();
 					stuff.add(link);
 				}
 				super.visit(link);
@@ -189,6 +221,11 @@ public class Storm {
 			@Override
 			public void visit(ListItem listItem) {
 				emptyBuffer();
+				if (mode.peek() == Mode.BULLETS) {
+					stuff.add(BULLET);
+				} else if (mode.peek() == Mode.ORDERED) {
+					stuff.add(nextNumber++);
+				}
 				super.visit(listItem);
 				emptyBuffer();
 			}
@@ -196,6 +233,7 @@ public class Storm {
 			@Override
 			public void visit(OrderedList orderedList) {
 				emptyBuffer();
+				nextNumber = 1;
 				mode.push(Mode.ORDERED);
 				super.visit(orderedList);
 				emptyBuffer();
@@ -205,10 +243,13 @@ public class Storm {
 			@Override
 			public void visit(Paragraph paragraph) {
 				emptyBuffer();
-				mode.push(Mode.NORMAL);
+//				if (mode.peek() == Mode.BULLETS) {
+//					stuff.add(BULLET);
+//				} else if (mode.peek() == Mode.ORDERED) {
+//					stuff.add(nextNumber++);
+//				}
 				super.visit(paragraph);
 				emptyBuffer();
-				mode.pop();
 			}
 
 			@Override
@@ -250,6 +291,10 @@ public class Storm {
 
 		for (TweetStructure ts : tweets) {
 			System.out.println(ts);
+			int urlLen = (ts.url instanceof String) ? ((String) ts.url).length() : 0;
+			if (ts.text.length() + urlLen > MAX_CHARS_OUT) {
+				throw new Exception("Tweet too long");
+			}
 		}
 		
 	}
@@ -276,7 +321,7 @@ public class Storm {
 			while (!done) {
 				int i = new Random().nextInt(tweets.size());
 				TweetStructure ts = tweets.get(i);
-				if (ts.text.length() < 260) {
+				if (ts.text.length() < MAX_CHARS) {
 					ts.text = ts.text + " #"+tag;
 					done = true;
 				}
@@ -303,8 +348,7 @@ public class Storm {
 		
 		for (Object s : stuff) {
 			if (s == END) {
-				tweets.add(next);
-				next = new TweetStructure();
+				next = newTweet(next);
 			} else if (s instanceof String) {
 				if (((String) s).length() + next.text.length() > MAX_CHARS) {
 					tweets.add(next);
@@ -317,38 +361,28 @@ public class Storm {
 				
 				next.text += s;
 			} else if (s instanceof Link) {
-				if (next.url != null) {
-					tweets.add(next);
-					next = new TweetStructure();
-				}
+				next = newUrlTweet(next);
 				next.url = ((Link) s).getDestination();
 			} else if (s instanceof BlockQuote) {
-				if (next.url != null) {
-					tweets.add(next);
-					next = new TweetStructure();
-				}
-				
-				next.url = new File(riskFirstWikiDir + Article.createQuoteFilePath(f, blockQuotes++));
-				
+				next = newUrlTweet(next);
+				next.url = new File(riskFirstWikiDir + Article.createQuoteFilePath(f, blockQuotes, riskFirstWikiDir));
+				blockQuotes++;
 				if (!((File)next.url).exists()) {
 					throw new RuntimeException("Can't find "+next.url);
 				}
 			} else if (s instanceof Image) {
-				if (next.url != null) {
-					tweets.add(next);
-					next = new TweetStructure();
-				}
-				
+				next = newUrlTweet(next);
 				next.url = ImageTweetSource.getImageFile(riskFirstWikiDir, pageUrl.toString(), ((Image) s).getDestination());
 				
 				if (!((File)next.url).exists()) {
 					throw new RuntimeException("Can't find "+next.url);
 				}
-				blockQuotes++;
-			} else {
-				
-				// what else?
-				return;
+			} else if (s instanceof Number) {
+				next = newTweet(next);
+				next.text = ""+s+")";
+			} else if (s == BULLET) {
+				next = newTweet(next);
+				next.text = " - ";
 			}
 		}
 		
@@ -356,6 +390,24 @@ public class Storm {
 			tweets.add(next);
 		}
 		
+	}
+
+
+	public TweetStructure newUrlTweet(TweetStructure next) {
+		if (next.url != null) {
+			tweets.add(next);
+			next = new TweetStructure();
+		}
+		return next;
+	}
+
+
+	public TweetStructure newTweet(TweetStructure next) {
+		if ((next.url != null) || (next.text.length() > 0)) {
+			tweets.add(next);
+			next = new TweetStructure();
+		}
+		return next;
 	}
 
 	static Status top;

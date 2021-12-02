@@ -16,21 +16,21 @@ public class ArticleLoader {
 	public List<Article> loadArticles(String dir) throws FileNotFoundException, IOException {
 		List<Article> out = new ArrayList<>();
 		File f = new File(dir);
-		recurse(f, out);
+		recurse(f, out, dir);
 		return out;
 	}
 
-	private void recurse(File f, List<Article> out) throws FileNotFoundException, IOException {
+	private void recurse(File f, List<Article> out, String dir) throws FileNotFoundException, IOException {
 		if (f.isDirectory()) {
 			File[] contents = f.listFiles();
 			for (int i = 0; i < contents.length; i++) {
 				File f2 = contents[i];
-				recurse(f2, out);
+				recurse(f2, out, dir);
 			}
 		} else if (f.getName().endsWith(".md")) {
 			String contents = toString(new FileInputStream(f));
 			ArticleState as = getStateFor(contents);
-			Article art = new Article(as, f);
+			Article art = new Article(as, f, dir);
 			out.add(art);
 			System.out.println("Loaded: "+art);
 			
