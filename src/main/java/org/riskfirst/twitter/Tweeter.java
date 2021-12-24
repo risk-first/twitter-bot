@@ -89,7 +89,7 @@ public class Tweeter {
 		tweets = articleTweetSource.getRandomTweets(amount("articles", 1));
 		potentialTweets.addAll(tweets);
 		
-		TweetSource quoteTweetSource = new  QuoteTweetSource(articles, baseURI, tags, riskFirstWikiDir, "/images/generated/quotes");
+		TweetSource quoteTweetSource = new  QuoteTweetSource(articles, baseURI, tags, riskFirstWikiDir);
 		tweets = quoteTweetSource.getRandomTweets(amount("quotes", 1));
 		potentialTweets.addAll(tweets);
 	}

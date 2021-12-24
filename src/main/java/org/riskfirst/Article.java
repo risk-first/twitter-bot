@@ -12,87 +12,84 @@ import java.util.regex.Pattern;
 public class Article {
 	
 	private final ArticleState state;
-	private final String text;
 	private final File f;
 	private transient List<Link> links;
+	private transient List<Link> quotes;
+	private final String dir;
 	
 	public File getFile() {
 		return f;
 	}
 
-	public Article(ArticleState state, String text, File f) {
+	public Article(ArticleState state, File f, String dir) {
 		super();
 		this.state = state;
-		this.text = text;
 		this.f = f;
+		this.dir = dir;
 	}
 
 	public ArticleState getState() {
 		return state;
 	}
-
-	public String getText() {
-		return text;
-	}
 	
-	static Pattern p = Pattern.compile("(\\!)?\\[([^\\]]*?)\\]\\((.*?)\\)(\\{(.*?)\\})?");
-
+	static Pattern LINK_PATTERN = Pattern.compile("(\\!)?\\[([^\\]]*?)\\]\\((.*?)\\)(\\{(.*?)\\})?");
+	
 	public List<Link> getLinks() {
 		if (links == null) {
-			links = new ArrayList<>();
-			try {
-				BufferedReader br = new BufferedReader(new FileReader(f));
-				process(br, links, this);
-				br.close();
-			} catch (IOException e) {
-				throw new RuntimeException("Couldn't get links:", e);
-			}
+			process();
 		}
 		
 		return links;
 	}
 	
-	private static void process(BufferedReader br, List<Link> links, Article a) throws IOException {
-		String line = br.readLine();
-		int number = 1;
-		while (line != null) {
-			processLine(line, number, l -> links.add(l), t -> {}, a);
-			line = br.readLine();
-			number++;
+	public List<Link> getQuotes() {
+		if (quotes == null) {
+			process();
+		}
+		
+		return quotes;
+	}
+	
+	private void process() {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(f));
+			links = new ArrayList<>();
+			quotes = new ArrayList<>();
+			String line = br.readLine();
+			int number = 1;
+			while (line != null) {
+				processLine(line, number);
+				line = br.readLine();
+				number++;
+			}
+			br.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Couldn't get links:", e);
 		}
 	}
 	
-	public interface TextCollector {
-		
-		void addText(String text);
-		
-	}
-	
-	public interface LinkCollector {
-		
-		void addLink(Link l);
-		
-	}
-	
-	public static void processLine(String line, int number, LinkCollector lc, TextCollector tc, Article a) {
-		Matcher m = p.matcher(line);
-		int place = 0;
-		while (m.find()) {
-			int s = m.start();
-			int e = m.end();
-			
-			tc.addText(line.substring(place, s));
-			
-			String link = line.substring(s, e);
-			
-			String bang = m.group(1);
-			String text = m.group(2);
-			String url = m.group(3);
-			lc.addLink(new Link(bang != null, text, url, link, number, a));
-			place = e;
+	public void processLine(String line, int number) {
+		Matcher linkMatcher = LINK_PATTERN.matcher(line);
+		while (linkMatcher.find()) {
+			String bang = linkMatcher.group(1);
+			String text = linkMatcher.group(2);
+			String url = linkMatcher.group(3);
+			links.add(new Link(bang != null, text, url, number, this));
 		}
 		
-		tc.addText(line.substring(place));
+		if (line.startsWith(">") && (line.indexOf("- [") > -1)) {
+			// it's a quote
+			String quoteLink = createQuoteFilePath(this.f, quotes.size(), dir);
+			quotes.add(new Link(true, "", quoteLink, number, this));
+		}
+		
+	}
+
+	public static String createQuoteFilePath(File f, int i, String dir) {
+		String quoteLink = f.getPath()
+			.replace(dir, "/images/generated/quotes")
+			.replace(".md", "-"+i+".png");
+		return quoteLink;
 	}
 
 	@Override

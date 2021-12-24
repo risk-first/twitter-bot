@@ -16,29 +16,28 @@ public class ArticleLoader {
 	public List<Article> loadArticles(String dir) throws FileNotFoundException, IOException {
 		List<Article> out = new ArrayList<>();
 		File f = new File(dir);
-		recurse(f, out);
+		recurse(f, out, dir);
 		return out;
 	}
 
-	private void recurse(File f, List<Article> out) throws FileNotFoundException, IOException {
+	private void recurse(File f, List<Article> out, String dir) throws FileNotFoundException, IOException {
 		if (f.isDirectory()) {
 			File[] contents = f.listFiles();
 			for (int i = 0; i < contents.length; i++) {
 				File f2 = contents[i];
-				recurse(f2, out);
+				recurse(f2, out, dir);
 			}
 		} else if (f.getName().endsWith(".md")) {
 			String contents = toString(new FileInputStream(f));
 			ArticleState as = getStateFor(contents);
-			
-			Article art = new Article(as, contents, f);
+			Article art = new Article(as, f, dir);
 			out.add(art);
 			System.out.println("Loaded: "+art);
 			
 		}
 	}
 	
-	private String toString(InputStream inputStream) throws IOException {
+	public static String toString(InputStream inputStream) throws IOException {
 		BufferedInputStream bis = new BufferedInputStream(inputStream);
 		ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		int result = bis.read();
@@ -51,20 +50,10 @@ public class ArticleLoader {
 	}
 
 	private ArticleState getStateFor(String contents) {
-		contents = contents.substring(0, contents.indexOf('\n')+1);
-		if (contents.contains("state/uc.png")) {
-			return ArticleState.UNDER_CONSTRUCTION;
-		} else if (contents.contains("state/draft.png")) {
-			return ArticleState.DRAFT;
-		} else if (contents.contains("state/for-review.png")) {
-			return ArticleState.FOR_REVIEW;
-		} else if (contents.contains("state/reviewed.png")) {
-			return ArticleState.REVIEWED;
-		} else if (contents.contains("---")) {
-			// this means meta data is set, the article is published.
-			return ArticleState.REVIEWED;
+		if (contents.contains("tweet: yes")) {
+			return ArticleState.TWEETABLE;
 		} else {
-			return ArticleState.NONE;
+			return ArticleState.NOT_TWEETABLE;
 		}
 	}
 	

@@ -1,5 +1,8 @@
 package org.riskfirst.twitter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -27,6 +30,35 @@ public abstract class AbstractRiskFirstWikiTweetSource extends AbstractTweetSour
 
 	public List<Article> getArticlesInState(EnumSet<ArticleState> states) {
 		List<Article> out =  articles.stream().filter(a -> states.contains(a.getState())).collect(Collectors.toList());
+		return out;
+	}
+	
+
+	protected String getArticleUrl(Article a) throws IOException {
+		return a.getUrl(baseUri.toString(), riskFirstWikiDir);
+	}
+	
+	public static File getImageFile(String riskFirstWikiDir, String articleUrl, String imageUrl) throws FileNotFoundException {
+		File out;
+		try {
+			if (imageUrl.startsWith("/")) {
+				out = new File(riskFirstWikiDir, imageUrl);
+			} else {
+				URI uri = new URI(articleUrl);
+				
+				String dir = uri.getPath().substring(0, uri.getPath().lastIndexOf("/"));
+				
+				out = new File(riskFirstWikiDir, dir);
+				out = new File(out, imageUrl);
+				out = out.getCanonicalFile();
+			}
+		} catch (Exception e) {
+			throw new FileNotFoundException("Couldn't find: "+ e.getMessage());
+		}
+		
+		if (!out.exists()) {
+			throw new FileNotFoundException("Image not found: "+out.toString());
+		}
 		return out;
 	}
 	

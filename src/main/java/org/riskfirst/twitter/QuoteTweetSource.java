@@ -1,12 +1,13 @@
 package org.riskfirst.twitter;
 
-import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.riskfirst.Article;
+import org.riskfirst.ArticleState;
+import org.riskfirst.Link;
 
 import twitter4j.StatusUpdate;
 
@@ -14,37 +15,32 @@ import twitter4j.StatusUpdate;
  * Now uses quotes held in images.
  */
 public class QuoteTweetSource extends AbstractRiskFirstWikiTweetSource {
-	
-	private String quoteDir;
-	
-	public QuoteTweetSource(List<Article> articles, URI baseUri, List<String> tags, String riskFirstBaseDir, String quoteDir) {
+		
+	public QuoteTweetSource(List<Article> articles, URI baseUri, List<String> tags, String riskFirstBaseDir) {
 		super(articles, baseUri, tags, riskFirstBaseDir);
-		this.quoteDir = quoteDir;
 	}
 	
 	@Override
 	public List<StatusUpdate> getAllTweets() {
-		File f = new File(riskFirstWikiDir+quoteDir);
-		
-		System.out.println("getting quote tweets: "+f);
-		
-		return Arrays.stream(f.listFiles())
-				.filter(ff -> ff.getName().endsWith("png"))
-				.map(ff -> {
-			String articleUrl = createArticleUrl(ff);
-			StatusUpdate out = new StatusUpdate("from "+articleUrl+" "+suffix());
-			out.setMedia(ff);
-			System.out.println("Potential Tweet:"+out);
+		return getArticlesInState(EnumSet.of(ArticleState.TWEETABLE)).stream()
+			.flatMap(a -> a.getQuotes().stream())
+			.filter(l -> !l.isExternal())
+			.filter(l -> l.isImage())
+			.map(l -> convertToStatusUpdate(l))
+			.filter(l -> l != null)
+			.collect(Collectors.toList());
+	}
+	
+	private StatusUpdate convertToStatusUpdate(Link l) {
+		try {
+			String articleUrl = getArticleUrl(l.getArticle());
+			StatusUpdate out = new StatusUpdate("From "+articleUrl+" "+suffix());
+			out.setMedia(getImageFile(riskFirstWikiDir, articleUrl, l.getUrl()));
 			return out;
-			
-		}).collect(Collectors.toList());
-		
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return null;
+		}
 	}
-
-	private String createArticleUrl(File ff) {
-		String name = ff.getName();
-		int us = name.lastIndexOf("_");
-		String article = name.substring(0, us);
-		return baseUri + article;
-	}
+	
 }
