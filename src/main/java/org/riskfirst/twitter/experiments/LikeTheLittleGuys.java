@@ -2,17 +2,11 @@ package org.riskfirst.twitter.experiments;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import twitter4j.Paging;
-import twitter4j.Query;
-import twitter4j.Query.ResultType;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -55,7 +49,7 @@ public class LikeTheLittleGuys {
 					User u = status.getUser();
 					
 					if (!alreadyLiked.contains(u.getId())) {
-						if ((den < 5) && (u.getFollowersCount() < 400)) {
+						if ((den < 5) && (u.getFollowersCount() < 500)) {
 							twitter.createFavorite(status.getId());
 							System.out.println("Liked "+u.getScreenName()+"("+u.getFollowersCount()+") at "+status.getCreatedAt());
 							alreadyLiked.add(u.getId());

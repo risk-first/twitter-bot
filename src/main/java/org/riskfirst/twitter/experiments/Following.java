@@ -26,4 +26,21 @@ public class Following {
 		
 		return out;
 	}
+	
+	public static Set<Long> getAllFollowersIds(Twitter t) throws TwitterException {
+		Set<Long> out = new LinkedHashSet<>();
+		long cursor = -1;
+		boolean hasNext = true;
+		while (hasNext) {
+			IDs in = t.getFollowersIDs(cursor);
+			for (Long long1 : in.getIDs()) {
+				out.add(long1);
+			}
+		
+			hasNext = in.hasNext();
+			cursor = in.getNextCursor();
+		}
+		
+		return out;
+	}
 }

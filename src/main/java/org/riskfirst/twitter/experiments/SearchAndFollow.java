@@ -33,6 +33,7 @@ public class SearchAndFollow {
 		Collections.shuffle(topics);
 		
 		Set<Long> alreadyFollowing = Following.getAllFollowingIds(twitter);
+		int newFollows = 0;
 		
 		for(int t=0; t<5;t++){
 			String topic = topics.get(t);
@@ -44,12 +45,17 @@ public class SearchAndFollow {
 				Date twoDaysAgo = Date.from(Instant.now().minus(2, ChronoUnit.DAYS));
 
 				for (User user : users) {
-					if ((user.getFollowersCount() < 150) && (!alreadyFollowing.contains(user.getId()))) {
+					if ((user.getFollowersCount() < 450) && (!alreadyFollowing.contains(user.getId()))) {
 						Status s = user.getStatus();
 
 						if ((s != null) && (s.getCreatedAt().after(twoDaysAgo))) {
 							System.out.println("Added: " + user.getScreenName()+" for topic "+topic);
 							twitter.createFriendship(user.getScreenName());
+							newFollows++;
+							
+							if (newFollows > 20) {
+								return;
+							}
 						}
 
 					}

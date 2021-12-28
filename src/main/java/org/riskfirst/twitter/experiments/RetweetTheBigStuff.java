@@ -15,10 +15,12 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.User;
 
-public class LargeNotManyRepliesYet {
+public class RetweetTheBigStuff {
 
 	static class Ratio implements Comparable<Ratio> {
 		float r;
+		float num, den;
+		
 		Status s;
 		
 		@Override
@@ -39,7 +41,7 @@ public class LargeNotManyRepliesYet {
 		
 		Twitter twitter = TwitterFactory.getSingleton();
 		
-		List<Ratio> done = new ArrayList<LargeNotManyRepliesYet.Ratio>();
+		List<Ratio> done = new ArrayList<RetweetTheBigStuff.Ratio>();
 		
 		for(int i = 0; i<8; i++) {
 			Paging p = new Paging(i+1, 200);
@@ -55,9 +57,8 @@ public class LargeNotManyRepliesYet {
 					
 					User u = status.getUser();
 					float den = u.getFollowersCount();
-					
-					if ((den > 10000) && (num < 5)) {
-						float ratio = den;
+					float ratio = num / den;
+					if ((num > 8) && (ratio > 0.001)) {
 						Ratio r = new Ratio();
 						r.r = ratio;
 						r.s = status;
@@ -66,12 +67,7 @@ public class LargeNotManyRepliesYet {
 					}
 				}
 			}
-			
-			
-			
 		}
-		
-		
 		
 		Collections.sort(done);
 		

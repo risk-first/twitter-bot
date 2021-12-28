@@ -34,7 +34,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>org.riskfirst.twitter.Tweeter</mainClass>
+							<mainClass>org.riskfirst.twitter.experiments.ExperimentTweeter</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
