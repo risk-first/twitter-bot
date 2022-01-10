@@ -1,4 +1,4 @@
-package org.riskfirst.twitter.experiments;
+package org.riskfirst.liker;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -49,12 +49,16 @@ public class LikeTheLittleGuys {
 					User u = status.getUser();
 					
 					if (!alreadyLiked.contains(u.getId())) {
-						if ((den < 5) && (u.getFollowersCount() < 500)) {
+						if (den < 5) {
 							twitter.createFavorite(status.getId());
 							System.out.println("Liked "+u.getScreenName()+"("+u.getFollowersCount()+") at "+status.getCreatedAt());
 							alreadyLiked.add(u.getId());
 						}
 					}
+				}
+				
+				if (alreadyLiked.size() > 20) {
+					return;
 				}
 			}
 			
