@@ -1,4 +1,4 @@
-package org.riskfirst.autotagbot;
+package org.riskfirst.autotagsbot;
 
 import java.io.File;
 import java.io.FileNotFoundException;

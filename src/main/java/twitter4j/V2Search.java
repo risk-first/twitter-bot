@@ -3,6 +3,7 @@ package twitter4j;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import twitter4j.auth.Authorization;
@@ -35,6 +36,7 @@ public class V2Search extends TwitterBaseImpl {
         }
     }
 	
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class MiniStatus {
 		
 		
@@ -56,11 +58,42 @@ public class V2Search extends TwitterBaseImpl {
 
 	}
 	
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	public static class MiniUser {
+		
+		String id;
+		String name;
+		String username;
+		
+		public String getId() {
+			return id;
+		}
+		public void setId(String id) {
+			this.id = id;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getUsername() {
+			return username;
+		}
+		public void setUsername(String username) {
+			this.username = username;
+		}
+		
+		
+	}
 	
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class Results  {
 		
 		List<MiniStatus> data;
 		Map<String, Object> meta;
+		Map<String, List<MiniUser>> includes;
 		
 		
 		public List<MiniStatus> getData() {
@@ -75,6 +108,12 @@ public class V2Search extends TwitterBaseImpl {
 		public void setMeta(Map<String, Object> meta) {
 			this.meta = meta;
 		}
+		public Map<String, List<MiniUser>> getIncludes() {
+			return includes;
+		}
+		public void setIncludes(Map<String, List<MiniUser>> includes) {
+			this.includes = includes;
+		}
 		
 		
 	}
@@ -86,7 +125,11 @@ public class V2Search extends TwitterBaseImpl {
 			    return deserialize(get(
 			            "https://api.twitter.com/2/tweets/search/recent" + query.nextPage()), Results.class);
 			} else {
-				HttpParameter[] params = new HttpParameter[] { new HttpParameter("query", query.getQuery()) };
+				HttpParameter[] params = new HttpParameter[] { 
+						new HttpParameter("query", query.getQuery()),
+						new HttpParameter("expansions","author_id")
+						};
+
 			    return deserialize(get(
 			            "https://api.twitter.com/2/tweets/search/recent", params), Results.class);
 			}
@@ -99,7 +142,8 @@ public class V2Search extends TwitterBaseImpl {
 
 
     private <X> X deserialize(HttpResponse httpResponse, Class<X> c) throws Exception {
-		return om.readValue(httpResponse.asStream(), c);
+    	String val = httpResponse.asString();
+		return om.readValue(val, c);
 	}
 
 

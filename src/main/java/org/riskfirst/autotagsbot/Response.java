@@ -1,4 +1,4 @@
-package org.riskfirst.autotagbot;
+package org.riskfirst.autotagsbot;
 
 import java.awt.Choice;
 import java.util.List;

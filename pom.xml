@@ -34,7 +34,11 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>org.riskfirst.twitter.experiments.ExperimentTweeter</mainClass>
+						<!-- 
+							<mainClass>org.riskfirst.liker.LikeTheLittleGuys</mainClass> 
+							<mainClass>org.riskfirst.hackernews.HackerNews</mainClass>
+						-->
+						<mainClass>org.riskfirst.autotagsbot.AutoTagsBot</mainClass> -->
 						</manifest>
 					</archive>
 					<descriptorRefs>
