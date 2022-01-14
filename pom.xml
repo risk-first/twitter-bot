@@ -36,9 +36,9 @@
 						<manifest>
 						<!-- 
 							<mainClass>org.riskfirst.liker.LikeTheLittleGuys</mainClass> 
-							<mainClass>org.riskfirst.hackernews.HackerNews</mainClass>
-						-->
 						<mainClass>org.riskfirst.autotagsbot.AutoTagsBot</mainClass> -->
+						-->
+							<mainClass>org.riskfirst.hackernews.HackerNews</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

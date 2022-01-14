@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.jsoup.Jsoup;
 
 import twitter4j.Query;
@@ -22,6 +24,10 @@ import twitter4j.TwitterFactory;
 
 public class HackerNews {
 
+	
+	private static final Client BUILD = ClientBuilder.newBuilder()
+			.register(JacksonFeature.class)
+			.build();
 	
 	public static final int TWEETS_PER_STORY = 2;
 	public static final int MAX_STORIES = 20;
@@ -127,7 +133,7 @@ public class HackerNews {
 
 
 	public static void withTop20Urls(Consumer<Story> storyConsumer) {
-		WebTarget wt = ClientBuilder.newBuilder().build().target("https://hacker-news.firebaseio.com");
+		WebTarget wt = BUILD.target("https://hacker-news.firebaseio.com");
 		WebTarget topStories = wt.path("v0/topstories.json");
 		GenericType<List<Long>> gt = new GenericType<List<Long>>() {};
 		List<Long> ll = topStories.request(MediaType.APPLICATION_JSON).get(gt);
@@ -142,7 +148,7 @@ public class HackerNews {
 	}
 	
 	public static Story getStory(long id) {
-		WebTarget wt = ClientBuilder.newClient().target("https://hacker-news.firebaseio.com/v0/item/"+id+".json");
+		WebTarget wt = BUILD.target("https://hacker-news.firebaseio.com/v0/item/"+id+".json");
 		Story out = wt.request().get(Story.class);
 		return out;
 	}
