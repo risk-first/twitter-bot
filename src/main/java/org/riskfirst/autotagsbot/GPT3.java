@@ -6,13 +6,21 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.jackson.JacksonFeature;
+
 public class GPT3 {
 
+	
+	private static final Client CLIENT = ClientBuilder
+			.newBuilder()
+			.register(JacksonFeature.class)
+			.build();
 	
 	String apiKey;
 	
@@ -22,7 +30,7 @@ public class GPT3 {
 	}
 	
 	public String call(String text) {
-		WebTarget wt = ClientBuilder.newBuilder().build().target("https://api.openai.com/v1/engines/davinci/completions");
+		WebTarget wt = CLIENT.target("https://api.openai.com/v1/engines/davinci/completions");
 		Query q = new Query(text);
 		Entity<Query> data = Entity.entity(q, MediaType.APPLICATION_JSON);
 		

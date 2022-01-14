@@ -15,13 +15,14 @@ public class Query {
 	float presencePenalty = 0f;
 	List<String> stop = Arrays.asList("\n");
 
-	public Query(String query) {
-		super();
-		this.prompt = query;
-	}
 
 	public Query() {
 		super();
+	}
+	
+	public Query(String query) {
+		super();
+		this.prompt = query;
 	}
 
 	
