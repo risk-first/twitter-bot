@@ -1,6 +1,7 @@
 /bin/
 /target
 twitter4j.properties
+openai.properties
 .project
 .classpath
 /.settings

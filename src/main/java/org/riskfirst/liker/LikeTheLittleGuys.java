@@ -45,14 +45,24 @@ public class LikeTheLittleGuys {
 				}
 				
 				if ((!status.isRetweet()) && (!status.isFavorited())) {
-					float den = status.getRetweetCount() + status.getFavoriteCount();
+					int den = status.getRetweetCount() + status.getFavoriteCount();
 					User u = status.getUser();
+					int follows = u.getFollowersCount();
 					
 					if (!alreadyLiked.contains(u.getId())) {
-						if (den < 5) {
-							twitter.createFavorite(status.getId());
+						if ((den < 5) && (follows < 1000)) {
+							Status s = twitter.createFavorite(status.getId());
 							System.out.println("Liked "+u.getScreenName()+"("+u.getFollowersCount()+") at "+status.getCreatedAt());
 							alreadyLiked.add(u.getId());
+							
+							if (s.getRateLimitStatus() != null) {
+								return;
+							}
+							
+							try {
+								Thread.sleep(5000);
+							} catch (InterruptedException e) {
+							}
 						}
 					}
 				}
