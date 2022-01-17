@@ -6,9 +6,16 @@
 	<groupId>com.github.risk-first</groupId>
 	<artifactId>twitter-bot</artifactId>
 	<version>0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 
 	<name>Risk First Code</name>
+
+	<modules>
+		<module>likes</module>
+		<module>hncomment</module>
+		<module>riskfirst</module>
+		<module>autotagsbot</module>
+	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,92 +36,11 @@
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-						<!-- 
-							<mainClass>org.riskfirst.liker.LikeTheLittleGuys</mainClass> 
-						<mainClass>org.riskfirst.autotagsbot.AutoTagsBot</mainClass> -->
-						-->
-							<mainClass>org.riskfirst.hackernews.HackerNews</mainClass>
-						</manifest>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-			</plugin>
 		</plugins>
 
 	</build>
 
 
-	<dependencies>
-
-		<dependency>
-			<groupId>org.commonmark</groupId>
-			<artifactId>commonmark</artifactId>
-			<version>0.18.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.commonmark</groupId>
-			<artifactId>commonmark-ext-gfm-tables</artifactId>
-			<version>0.18.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.twitter4j</groupId>
-			<artifactId>twitter4j-core</artifactId>
-			<version>4.0.6</version>
-		</dependency>
-		<dependency>
-            <groupId>org.twitter4j</groupId>
-            <artifactId>twitter4j-async</artifactId>
-            <version>4.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.twitter4j</groupId>
-            <artifactId>twitter4j-stream</artifactId>
-            <version>4.0.6</version>
-        </dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-yaml</artifactId>
-			<version>2.11.2</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.glassfish.jersey.core</groupId>
-		    <artifactId>jersey-client</artifactId>
-		    <version>2.25.1</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.glassfish.jersey.media</groupId>
-		    <artifactId>jersey-media-moxy</artifactId>
-		    <version>2.25.1</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.glassfish.jersey.media</groupId>
-		    <artifactId>jersey-media-json-jackson</artifactId>
-		    <version>2.25.1</version>
-		</dependency>
-		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-annotations</artifactId>
-		    <version>2.11.2</version>
-		</dependency>
-		<dependency>
-		    <groupId>jakarta.xml.bind</groupId>
-		    <artifactId>jakarta.xml.bind-api</artifactId>
-		    <version>2.3.2</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.jsoup</groupId>
-		    <artifactId>jsoup</artifactId>
-		    <version>1.14.2</version>
-		</dependency>
-	</dependencies>
 
 
 
