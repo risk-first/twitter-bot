@@ -23,13 +23,13 @@ import twitter4j.User;
  * @author rob@kite9.com
  *
  */
-public class LikeTheLittleGuys {
+public class LikeTheLittleGuysOld2 {
 	
 	public static void main(String[] args) throws TwitterException {
 		
 		Twitter twitter = TwitterFactory.getSingleton();
 		
-		Date oneHourAgo = Date.from(Instant.now().minus(3, ChronoUnit.HOURS));
+		Date sixHourAgo = Date.from(Instant.now().minus(6, ChronoUnit.HOURS));
 		
 		Set<Long> alreadyLiked = new HashSet<>();
 				
@@ -40,31 +40,20 @@ public class LikeTheLittleGuys {
 		
 			for (Status status : tl) {
 				
-				if (status.getCreatedAt().before(oneHourAgo)) {
-					return;
-				}
+				if (!status.getCreatedAt().before(sixHourAgo)) {
 				
-				if ((!status.isRetweet()) && (!status.isFavorited())) {
-					int den = status.getRetweetCount() + status.getFavoriteCount();
-					User u = status.getUser();
-					int follows = u.getFollowersCount();
-					
-					if (!alreadyLiked.contains(u.getId())) {
-						if ((den < 5) && (follows < 1000)) {
-							Status s = twitter.createFavorite(status.getId());
-							System.out.println("Liked "+u.getScreenName()+"("+u.getFollowersCount()+") at "+status.getCreatedAt());
-							alreadyLiked.add(u.getId());
-							
-							if (s.getRateLimitStatus() != null) {
-								return;
-							}
-							
-							try {
-								Thread.sleep(5000);
-							} catch (InterruptedException e) {
+					if ((!status.isFavorited())) {
+						int den = status.getRetweetCount() + status.getFavoriteCount();
+						User u = status.getUser();
+						int follows = u.getFollowersCount();
+						
+						if (!alreadyLiked.contains(u.getId())) {
+							if ((den < 5) && (follows < 1000)) {
+								doLike(twitter, alreadyLiked, status, u);
 							}
 						}
 					}
+				
 				}
 				
 				if (alreadyLiked.size() > 20) {
@@ -76,5 +65,20 @@ public class LikeTheLittleGuys {
 		}
 		
 		
+	}
+
+	private static void doLike(Twitter twitter, Set<Long> alreadyLiked, Status status, User u) throws TwitterException {
+		Status s = twitter.createFavorite(status.getId());
+		System.out.println("Liked "+u.getScreenName()+"("+u.getFollowersCount()+") at "+status.getCreatedAt());
+		alreadyLiked.add(u.getId());
+		
+		if (s.getRateLimitStatus() != null) {
+			return;
+		}
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+		}
 	}
 }

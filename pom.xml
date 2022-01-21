@@ -11,6 +11,7 @@
 	<name>Risk First Code</name>
 
 	<modules>
+		<module>v2api</module>
 		<module>likes</module>
 		<module>hncomment</module>
 		<module>riskfirst</module>

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import twitter4j.Query;
 import twitter4j.Status;
@@ -36,10 +37,12 @@ public class ThreadSummarizer {
 
 	public void summarize(Status s, Status replyTo) {
 		try {
+			System.out.println("Summarizing");
 			StringBuilder sb = new StringBuilder();
 			List<Status> hist = getHistory(s);
 			
 			if (alreadyInThread(hist)) {
+				System.out.println("Already in Thread");
 				return;
 			}
 			
@@ -50,14 +53,17 @@ public class ThreadSummarizer {
 			Results allReplies = getReplies(top);
 			
 			if (alreadyReplied(allReplies)) {
+				System.out.println("Already replied");
 				return;
 			}
 			
 			if (allReplies.getData()==null) {
+				System.out.println("No replies found");
 				return;
 			}
 			
 			if (justMyReply(allReplies, replyTo)) {
+				System.out.println("Only your reply found");
 				return;
 			}
 			
@@ -77,20 +83,24 @@ public class ThreadSummarizer {
 			
 			System.out.println("Request: "+sb.toString());
 			System.out.println("Response: "+gptResponse);
-			String tags = Arrays.stream(gptResponse.split(","))
+			List<String> tags = Arrays.stream(gptResponse.split(","))
 				.map(r -> r.trim())
 				.filter(r -> r.length() > 0)
 				.map(r -> "#"+r.replace(" ", "")+" ")
-				.limit(3)
-				.reduce(String::concat).orElse("?");
+				.limit(5)
+				.collect(Collectors.toList());
+				
+			String tagString = tags.stream().reduce(String::concat).orElse("?");
 			
-			if (tags.length() < 5) {
+			if (tags.size() < 2) {
+				System.out.println("Not enough tags");
 				return;
 			}
 			
 			String tweetUrl = "https://twitter.com/"+s.getUser().getScreenName()+"/status/"+s.getId();
 			
-			String statusText = "In 3 tags: "+tags+"\n\n"+tweetUrl;
+			String statusText = "In "+tags.size()+" tags: "+tagString+"\n\n"+tweetUrl;
+			
 			StatusUpdate out = new StatusUpdate(statusText);
 			if (replyTo != null ) {
 				String prefix = "@" + replyTo.getUser().getScreenName() + "\n";
@@ -101,6 +111,7 @@ public class ThreadSummarizer {
 			}
 			
 			t.updateStatus(out);
+			System.out.println("done");
 		} catch (TwitterException e) {
 			e.printStackTrace();
 		}

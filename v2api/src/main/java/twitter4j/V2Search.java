@@ -118,6 +118,13 @@ public class V2Search extends TwitterBaseImpl {
 		
 	}
 	
+	public Results search(String endpoint, HttpParameter[] params) throws TwitterException {
+		try {
+			return deserialize(get("https://api.twitter.com/"+endpoint, params), Results.class);
+		} catch (Exception e) {
+			throw new TwitterException(e);
+		}
+	}
 	
     public Results search(Query query) throws TwitterException {
         try {

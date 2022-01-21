@@ -26,6 +26,7 @@ public class MentionListener implements StatusListener {
 	@Override
 	public void onStatus(Status status) {
 		if (hasMention(status)) {
+			System.out.println("Mentioned by "+status.getUser().getScreenName());
 			if (status.getInReplyToStatusId() > 0) {
 				try {
 					ts.summarize(status.getInReplyToStatusId(), status);
