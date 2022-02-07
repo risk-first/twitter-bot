@@ -1,0 +1,21 @@
+### INPUT:
+I feel like the author has a bit of a naive catholic schoolgirl attitude here.  My goodness, what possible use there could be for a raspberry-pi-like device inside a longer-than-normal-looking SFP? Made by Russians, no less. An experienced network engineer would probably do a double-take if they saw one of these in their rack. But if it was not their gear, or a site they weren't familiar with, they'd probably barely think more than "jesus, that's a long SFP module, yeesh."
+
+### OUTPUT:
+Russian, Network, Surprise
+
+### INPUT
+You're still maintaining it. In the sense that _if_ it fails in the future - you must fix it, and fairly quickly. So you need to maintain the toolchain and be at least sufficiently familiar with it that you or somebody in the team can hop in and fix things if needed.  That, on its own, is a cost, and that cost can warrant a refactor. To go for an extreme:
+It's written in COBOL, it is the last cobol code in your entire code base, and the only engineer with any experience in cobol is about to retire.
+
+### OUTPUT:
+Cost, Code, Refactor
+
+### INPUT:
+There’s a book I really enjoyed called Narconomics.  It helps explain all aspects of the drug trade through the lens of business.
+One of the most fascinating takeaways was how they handle “contract enforcement” in the absence of a legal system or courts (hint: Violence)
+Because when you sign up to be a mule they take down the names and addresses of your entire family (nearby), and will kill them if you steal the product. Contract enforcement.
+
+### OUTPUT:
+Drugs, Contracts, Business
+

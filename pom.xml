@@ -16,6 +16,8 @@
 		<module>hncomment</module>
 		<module>riskfirst</module>
 		<module>autotagsbot</module>
+		<module>topicmail</module>
+		<module>tweetshark</module>
 	</modules>
 
 	<properties>

@@ -2,6 +2,9 @@
 /target
 twitter4j.properties
 openai.properties
+mail.properties
 .project
 .classpath
 /.settings
+application.yml
+application-*.yml

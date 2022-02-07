@@ -1,12 +1,16 @@
 package org.riskfirst.hackernews;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -34,7 +38,7 @@ import twitter4j.TwitterFactory;
  * Finds occasions where people have tweeted hacker news articles, and replies to them
  * with the comments from hacker news.  
  * 
- * Won't reply to the same person within 3 days.
+ * Won't reply to the same person within a day.
  * 
  * Now reduced to 14 stories to hopefully avoid the problem of 
  * being banned.  I really have no idea why this is happening.
@@ -49,14 +53,21 @@ public class HackerNews {
 			.register(JacksonFeature.class)
 			.build();
 	
-	public static final int TWEETS_PER_STORY = 2;
-	public static final int MAX_STORIES = 12;
-	public static final int MAX_REPLIES = 10;
+	public static int tweetsPerStory = 2;
+	public static int maxStories = 12;
+	public static int maxReplies = 10;
+	public static int replyTimeout = 1 * 24 * 60 * 60;
 		
 	public static Map<String, Long> lastReplies;
  	
 	
 	public static void main(String[] args) throws Exception {
+		Properties props = new Properties();
+		props.load(new FileReader(new File("hncomment.properties")));
+		tweetsPerStory = Integer.parseInt((String) props.getOrDefault("tweetsPerStory", ""+tweetsPerStory));
+		maxStories = Integer.parseInt((String) props.getOrDefault("maxStories", ""+maxStories));
+		maxReplies = Integer.parseInt((String) props.getOrDefault("maxReplies", ""+maxReplies));
+		replyTimeout = Integer.parseInt((String) props.getOrDefault("replyTimeout", ""+replyTimeout));
 		
 		// load up the top 20 hacker news articles
 		Twitter twitter = TwitterFactory.getSingleton();
@@ -68,18 +79,16 @@ public class HackerNews {
 	
 	
 	private static void loadLastReplies() throws Exception {
-		long threeDaysAgo = Instant.now().minus(3, ChronoUnit.DAYS).toEpochMilli();
+		long oneDayAgo = Instant.now().minus(replyTimeout, ChronoUnit.SECONDS).toEpochMilli();
 		
 		File rep = new File("replies.json");
 		if (rep.exists()) {
 			lastReplies = new ObjectMapper().readValue(rep, new TypeReference<Map<String, Long>>() {});
-			for (Map.Entry<String, Long> entry : lastReplies.entrySet()) {
-				String key = entry.getKey();
-				Long val = entry.getValue();
-				if (val < threeDaysAgo) {
-					lastReplies.remove(key);
-				}
-			}
+			
+			lastReplies = lastReplies.entrySet().stream()
+				.filter(e -> e.getValue() > oneDayAgo)
+				.collect(Collectors.toMap(e-> e.getKey(), e -> e.getValue()));
+			
 		} else {
 			lastReplies = new HashMap<String, Long>();
 		}
@@ -108,7 +117,7 @@ public class HackerNews {
 				Query q = new Query("\""+url+"\" +exclude:retweets");
 				
 				// limit replies
-				q.setCount(MAX_REPLIES);
+				q.setCount(maxReplies);
 				
 				// todo - add the last hour/whatever
 				QueryResult qr = t.search(q);
@@ -155,7 +164,7 @@ public class HackerNews {
 		return in.getKids().stream()
 			.distinct()
 			.map(l -> getStory(l))
-			.limit(TWEETS_PER_STORY)
+			.limit(tweetsPerStory)
 			.collect(Collectors.toList());
 	}
 	
@@ -168,26 +177,32 @@ public class HackerNews {
 		try {
 			String html = reply.getText();
 			
-			// twitter can only handle first few characters...
-			String screenName = tw.getUser().getScreenName();
-			String prefix = "@" + screenName + "\n";
+			if (html != null) {
 			
-			String urlForComments = "\n\nContinues on HN: " + createCommentsUrl(s);
-			int excerptLength = 280 - urlForComments.length() - 10 - prefix.length();
+				// twitter can only handle first few characters...
+				String screenName = tw.getUser().getScreenName();
+				String prefix = "@" + screenName + "\n";
+				
+				String urlForComments = "\n\nContinues on HN: " + createCommentsUrl(s);
+				int excerptLength = 280 - urlForComments.length() - 10 - prefix.length();
+				
+				String text = convertToText(html);
+				String excerpt = (text.length() < excerptLength) ? "\""+text+"\"" : "\""+text.substring(0, excerptLength)+"... \"";
+				String completeText = prefix + excerpt+urlForComments;
+				
+				StatusUpdate su = new StatusUpdate(completeText);
+				System.out.println("Posting: "+completeText.substring(0, 40));
+				
+				su.setInReplyToStatusId(tw.getId());
+				Status done = t.updateStatus(su);
+				System.out.println(done.getId()+" "+done.getRateLimitStatus()+" "+done.getText().replace("\n"," ").substring(0, 20));
+				lastReplies.put(screenName, Instant.now().toEpochMilli());
+				storeLastReplies();
+				return (done.getRateLimitStatus()== null);
 			
-			String text = convertToText(html);
-			String excerpt = (text.length() < excerptLength) ? "\""+text+"\"" : "\""+text.substring(0, excerptLength)+"... \"";
-			String completeText = prefix + excerpt+urlForComments;
-			
-			StatusUpdate su = new StatusUpdate(completeText);
-			System.out.println("Posting: "+completeText.substring(0, 40));
-			
-			su.setInReplyToStatusId(tw.getId());
-			Status done = t.updateStatus(su);
-			System.out.println(done.getId()+" "+done.getRateLimitStatus()+" "+done.getText().replace("\n"," ").substring(0, 20));
-			lastReplies.put(screenName, Instant.now().toEpochMilli());
-			storeLastReplies();
-			return (done.getRateLimitStatus()== null);
+			} else {
+				return false;
+			}
 		
 		} catch (TwitterException e) {
 			// TODO Auto-generated catch block
@@ -216,7 +231,7 @@ public class HackerNews {
 		GenericType<List<Long>> gt = new GenericType<List<Long>>() {};
 		List<Long> ll = topStories.request(MediaType.APPLICATION_JSON).get(gt);
 		Collections.shuffle(ll);
-		ll = ll.subList(0, MAX_STORIES);
+		ll = ll.subList(0, maxStories);
 		
 		ll.stream()
 			.map(id -> getStory(id))
