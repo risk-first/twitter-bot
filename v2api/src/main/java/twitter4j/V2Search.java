@@ -1,9 +1,12 @@
 package twitter4j;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import twitter4j.auth.Authorization;
@@ -42,7 +45,16 @@ public class V2Search extends TwitterBaseImpl {
 		
 		String id;
 		String text;
+		Map<String, Long> publicMetrics;
 
+	
+		@JsonProperty("public_metrics")
+		public Map<String, Long> getPublicMetrics() {
+			return publicMetrics;
+		}
+		public void setPublicMetrics(Map<String, Long> publicMetrics) {
+			this.publicMetrics = publicMetrics;
+		}
 		public String getId() {
 			return id;
 		}
@@ -55,6 +67,7 @@ public class V2Search extends TwitterBaseImpl {
 		public void setText(String text) {
 			this.text = text;
 		}
+		
 
 	}
 	
@@ -132,14 +145,43 @@ public class V2Search extends TwitterBaseImpl {
 			    return deserialize(get(
 			            "https://api.twitter.com/2/tweets/search/recent" + query.nextPage()), Results.class);
 			} else {
-				HttpParameter[] params = new HttpParameter[] { 
+				List<HttpParameter> params = new ArrayList<>(Arrays.asList(
 						new HttpParameter("query", query.getQuery()),
 						new HttpParameter("expansions","author_id"),
+						new HttpParameter("tweet.fields","public_metrics"),
 						new HttpParameter("max_results", 100)
-						};
+						));
+				
+				if (query.getMaxId() != -1 ) {
+					params.add(new HttpParameter("until_id", query.getMaxId()));
+				}
+				
+			    HttpResponse stream = get("https://api.twitter.com/2/tweets/search/recent", params.toArray(HttpParameter[]::new));
+				return deserialize(stream, Results.class);
+			}
+		} catch (Exception e) {
+			throw new TwitterException(e);
+		}
+    }
 
+    
+    public Results search30Days(Query query, String env) throws TwitterException {
+        try {
+			if (query.nextPage() != null) {
 			    return deserialize(get(
-			            "https://api.twitter.com/2/tweets/search/recent", params), Results.class);
+			            "https://api.twitter.com/1.1/tweets/search/30day/"+env+".json"), Results.class);
+			} else {
+				List<HttpParameter> params = new ArrayList<>(Arrays.asList(
+						new HttpParameter("query", query.getQuery())
+						));
+				
+				if (query.getMaxId() != -1 ) {
+					params.add(new HttpParameter("until_id", query.getMaxId()));
+				}
+				
+			    HttpResponse stream = get("https://api.twitter.com/1.1/tweets/search/30day/"+env+".json", params.toArray(HttpParameter[]::new));
+				Object o = stream.asJSONObject();
+			    return factory.createQueryResult(stream, query);
 			}
 		} catch (Exception e) {
 			throw new TwitterException(e);

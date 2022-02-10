@@ -18,6 +18,7 @@
 		<module>autotagsbot</module>
 		<module>topicmail</module>
 		<module>tweetshark</module>
+		<module>tweetprint</module>
 	</modules>
 
 	<properties>

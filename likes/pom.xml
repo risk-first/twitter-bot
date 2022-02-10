@@ -49,11 +49,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.github.risk-first</groupId>
-			<artifactId>v2api</artifactId>
-			<version>0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>org.commonmark</groupId>
 			<artifactId>commonmark</artifactId>
 			<version>0.18.0</version>
