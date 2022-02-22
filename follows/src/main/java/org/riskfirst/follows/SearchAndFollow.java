@@ -1,4 +1,4 @@
-package org.riskfirst.oldexperiments;
+package org.riskfirst.follows;
 
 import java.io.File;
 import java.io.FileReader;
@@ -18,14 +18,14 @@ import twitter4j.TwitterFactory;
 import twitter4j.User;
 
 /**
- * This is a known to work experiment.  Run this every couple of hours.
+ * This is a known to work experiment.  Run this every week.
  */
 public class SearchAndFollow {
 
 	static Properties props = new Properties();
 
 	public static void main(String[] args) throws Exception {
-		props.load(new FileReader(new File("tweeter.properties")));
+		props.load(new FileReader(new File("follows.properties")));
 
 		Twitter twitter = TwitterFactory.getSingleton();
 		

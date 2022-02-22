@@ -4,23 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.github.risk-first</groupId>
-	<artifactId>twitter-bot</artifactId>
+	<artifactId>follows</artifactId>
 	<version>0.1-SNAPSHOT</version>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 
-	<name>Risk First Code</name>
-
-	<modules>
-		<module>v2api</module>
-		<module>likes</module>
-		<module>hncomment</module>
-		<module>riskfirst</module>
-		<module>autotagsbot</module>
-		<module>topicmail</module>
-		<module>tweetshark</module>
-		<module>tweetprint</module>
-		<module>follows</module>
-	</modules>
+	<name>Follow Small Accounts</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -41,11 +29,31 @@
 				</configuration>
 			</plugin>
 
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>org.riskfirst.follows.SearchAndFollow</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
 		</plugins>
 
 	</build>
 
 
+	<dependencies>
+		<dependency>
+			<groupId>org.twitter4j</groupId>
+			<artifactId>twitter4j-core</artifactId>
+			<version>4.0.6</version>
+		</dependency>
+	</dependencies>
 
 
 
