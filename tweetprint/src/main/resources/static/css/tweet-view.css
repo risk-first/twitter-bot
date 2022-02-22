@@ -1,0 +1,33 @@
+  
+.main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.tweet-area {
+	width: 80%;
+	
+}
+
+.logo-title,
+.logo-image {
+   font-size: 100px;
+   font-family: 'Electrolize';
+   color: white;
+   display: inline-block;
+   padding: 10px;
+   text-align: center;
+ }
+ 
+ .logo-bot {
+   color: #0099FF; 
+ }
+ 
+ .logo-image img {
+   height: 70px;
+   background-color: white;
+   border-radius: 6px;
+   padding: 10px;
+ }

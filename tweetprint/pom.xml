@@ -2,11 +2,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.github.risk-first</groupId>
-	<artifactId>tweetshark</artifactId>
+	<artifactId>tweetprint</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>AutoTagsBot</name>
+	<name>Tweet Print</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,20 +55,87 @@
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>-->
 		<dependency>
-			<groupId>com.github.risk-first</groupId>
-			<artifactId>v2api</artifactId>
-			<version>0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>org.twitter4j</groupId>
 			<artifactId>twitter4j-core</artifactId>
 			<version>4.0.6</version>
+		</dependency>
+		
+		<!-- stripe, payments --> 
+		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>20.99.0</version>
 		</dependency> 
+		<dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>stripe</artifactId>
+            <version>8.157.0</version>
+        </dependency>
+
+		<!-- printing -->
+		<dependency>
+            <groupId>com.oddprints</groupId>
+            <artifactId>prodigi-java-sdk</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+		<dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>html2canvas</artifactId>
+            <version>1.4.1</version>
+        </dependency>	
+        <dependency>
+		    <groupId>org.thymeleaf</groupId>
+		    <artifactId>thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.thymeleaf</groupId>
+		    <artifactId>thymeleaf-spring5</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>org.kite9</groupId>
+            <artifactId>kite9-visualization-java</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <exclusions>
+		        <exclusion>
+		            <groupId>xml-apis</groupId>
+		            <artifactId>xml-apis</artifactId>
+		        </exclusion>
+    		</exclusions>
+        </dependency> 
+        <dependency>
+            <groupId>org.kite9</groupId>
+            <artifactId>kite9-templates</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency> 
+		
+		<dependency>
+		    <groupId>org.webjars.npm</groupId>
+		    <artifactId>twemoji</artifactId>
+		    <version>13.1.0</version>
+		     <exclusions>
+		        <exclusion>
+		            <groupId>org.webjars.npm</groupId>
+		            <artifactId>*</artifactId>
+		        </exclusion>
+    		</exclusions>
+		</dependency>
+
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>1.14.2</version>
 		</dependency>
+		
+		<!-- look and feel -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		
 	</dependencies>
 
 	<dependencyManagement>
@@ -83,5 +150,28 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<repositories>
+	    <repository>
+	        <id>github-pub</id>
+	        <url>https://maven.pkg.github.com/OddPrints/prodigi-java-sdk</url>
+	        <releases>
+	            <enabled>true</enabled>
+	        </releases>
+	        <snapshots>
+	            <enabled>true</enabled>
+	        </snapshots>
+	    </repository>
+	    <repository>
+	        <id>central</id>
+	        <url>https://repo1.maven.org/maven2</url>
+	        <releases>
+	            <enabled>true</enabled>
+	        </releases>
+	        <snapshots>
+	            <enabled>true</enabled>
+	        </snapshots>
+	    </repository>
+	</repositories>
+   
 
 </project>

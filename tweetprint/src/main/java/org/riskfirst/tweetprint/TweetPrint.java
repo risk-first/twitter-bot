@@ -1,13 +1,13 @@
-package org.riskfirst.tweetshark;
+package org.riskfirst.tweetprint;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TweetShark {
+public class TweetPrint {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TweetShark.class, args);
+		SpringApplication.run(TweetPrint.class, args);
 	}
 
 }
