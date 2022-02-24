@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+      
+      
+	<head>
+		<title>Arrange Tweet</title>
+		<link type="text/css" media="screen" rel="stylesheet" href="http://acornejo.github.io/jquery-cropbox/jquery.cropbox.css">
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/1.0.5/hammer.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.6/jquery.mousewheel.js"></script>
+		<script type="text/javascript" src="https://acornejo.github.io/jquery-cropbox/jquery.cropbox.js"></script>
+		<script type="text/javascript" defer=""  th:inline="javascript">
+			
+		    $( function () {
+				$('#img').attr("src", "[(@{/render-png(tweetId=${tweetId})})]")
+
+				$('#img').each( function () {
+		        var image = $(this),
+		            cropwidth = image.attr('cropwidth'),
+		            cropheight = image.attr('cropheight'),
+		            x       = $('#x'),
+		            y       = $('#y'),
+		            w       = $('#width'),
+		            h       = $('#height');
+		
+		          image.cropbox( {width: cropwidth, height: cropheight, showControls: 'auto' } )
+		            .on('cropbox', function( event, results, img ) {
+		              x.val( results.cropX );
+		              y.val( results.cropY );
+		              w.val( results.cropW );
+		              h.val( results.cropH );
+		            });
+		      } );
+		
+		    } );
+		 </script>
+
+   
+	</head>
+      
+	<body>
+
+	
+		<form action="addressPreview">
+		
+			<input type="hidden" id="tweetId" name="tweetId" th:value="${tweetId}" >
+		
+			<h3>Media</h3>
+			<input type="radio" id="postcard" name="cardType" value="Post Card" checked>
+			<label for="postcard">Post Card</label>
+			<input type="radio" id="greetingscard" name="cardType" value="Greetings Card">
+			<label for="greetingscard">Greetings Card</label>
+			
+			<h3>Arrangement</h3>
+			<input type="radio" id="landscape" name="arrangement" value="Landscape" checked>
+			<label for="landscape">Landscape</label>
+			<input type="radio" id="portrait" name="arrangement" value="Portrait">
+			<label for="portrait">Portrait</label>
+			
+			<h3>Look</h3>
+			<input type="radio" id="big" name="style" value="Big" checked>
+			<label for="big">Big</label>
+			<input type="radio" id="regular" name="style" value="Regular">
+			<label for="regular">Regular</label>
+			<input type="radio" id="minimal" name="style" value="Minimal">
+			<label for="regular">Minimal</label>
+			<input type="radio" id="media" name="style" value="Media">
+			<label for="regular">Media</label>
+		
+			<h3>Replies</h3>
+			<input type="checkbox" id="response" name="response" value="">
+			<label for="vehicle1"> Include Tweet Being Responding To</label><br>	
+			
+			<h3>Crop and Scale</h3>
+			
+			<input id="x" name="x" value="0">
+			<input id="y" name="y" value="0">
+			<input id="width" name="width" value="0" >
+			<input id="height" name="width" value="0" >
+			
+			<img id="img" 
+			th:src="@{images/noun-loading-4621975.svg}"
+			cropwidth="600" 
+			cropheight="300" >
+			
+			<h3>Message</h3>
+			
+			<textarea id="message" name="message">
+Dear Jim,
+
+Having a lovely time.
+
+Wish you were here!
+
+Love,
+
+Bob			
+			</textarea>
+			<label for="message">Message For the Recipient</label><br>	
+		
+		
+			<h3>Go</h3>
+			
+			<input type="submit"></input>
+		</form>
+
+
+	</body>
+
+</html>

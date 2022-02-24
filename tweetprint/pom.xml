@@ -55,87 +55,102 @@
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>-->
 		<dependency>
-			<groupId>org.twitter4j</groupId>
-			<artifactId>twitter4j-core</artifactId>
-			<version>4.0.6</version>
+			<groupId>io.github.redouane59.twitter</groupId>
+			<artifactId>twittered</artifactId>
+			<version>2.15</version>
 		</dependency>
-		
-		<!-- stripe, payments --> 
+
+		<!-- stripe, payments -->
 		<dependency>
 			<groupId>com.stripe</groupId>
 			<artifactId>stripe-java</artifactId>
 			<version>20.99.0</version>
-		</dependency> 
+		</dependency>
 		<dependency>
-            <groupId>org.webjars.npm</groupId>
-            <artifactId>stripe</artifactId>
-            <version>8.157.0</version>
-        </dependency>
+			<groupId>org.webjars.npm</groupId>
+			<artifactId>stripe</artifactId>
+			<version>8.157.0</version>
+		</dependency>
 
 		<!-- printing -->
 		<dependency>
-            <groupId>com.oddprints</groupId>
-            <artifactId>prodigi-java-sdk</artifactId>
-            <version>4.0.1</version>
-        </dependency>
-		<dependency>
-            <groupId>org.webjars.npm</groupId>
-            <artifactId>html2canvas</artifactId>
-            <version>1.4.1</version>
-        </dependency>	
-        <dependency>
-		    <groupId>org.thymeleaf</groupId>
-		    <artifactId>thymeleaf</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>org.thymeleaf</groupId>
-		    <artifactId>thymeleaf-spring5</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-webflux</artifactId>
-		</dependency>
-        <dependency>
-            <groupId>org.kite9</groupId>
-            <artifactId>kite9-visualization-java</artifactId>
-            <version>0.1-SNAPSHOT</version>
-            <exclusions>
-		        <exclusion>
-		            <groupId>xml-apis</groupId>
-		            <artifactId>xml-apis</artifactId>
-		        </exclusion>
-    		</exclusions>
-        </dependency> 
-        <dependency>
-            <groupId>org.kite9</groupId>
-            <artifactId>kite9-templates</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency> 
-		
-		<dependency>
-		    <groupId>org.webjars.npm</groupId>
-		    <artifactId>twemoji</artifactId>
-		    <version>13.1.0</version>
-		     <exclusions>
-		        <exclusion>
-		            <groupId>org.webjars.npm</groupId>
-		            <artifactId>*</artifactId>
-		        </exclusion>
-    		</exclusions>
+			<groupId>com.oddprints</groupId>
+			<artifactId>prodigi-java-sdk</artifactId>
+			<version>4.0.1</version>
 		</dependency>
 
+		<!-- webpages, cropbox -->
+	<!-- 	<dependency>
+			<groupId>org.webjars.npm</groupId>
+			<artifactId>jquery</artifactId>
+			<version>3.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>hammerjs</artifactId>
+			<version>1.1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery-mousewheel</artifactId>
+			<version>3.1.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>jquery-cropbox</artifactId>
+			<version>0.1.9</version>
+		</dependency> -->
+
+		<!-- controller flow -->
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf-spring5</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+
+		<!-- rendering tweets -->
+		<dependency>
+			<groupId>org.kite9</groupId>
+			<artifactId>kite9-visualization-java</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.kite9</groupId>
+			<artifactId>kite9-templates</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vdurmont</groupId>
+			<artifactId>emoji-java</artifactId>
+			<version>5.1.1</version>
+		</dependency>
+
+		<!-- handing html in tweets -->
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>1.14.2</version>
 		</dependency>
-		
+
 		<!-- look and feel -->
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
-		
+
 	</dependencies>
 
 	<dependencyManagement>
@@ -151,27 +166,27 @@
 	</dependencyManagement>
 
 	<repositories>
-	    <repository>
-	        <id>github-pub</id>
-	        <url>https://maven.pkg.github.com/OddPrints/prodigi-java-sdk</url>
-	        <releases>
-	            <enabled>true</enabled>
-	        </releases>
-	        <snapshots>
-	            <enabled>true</enabled>
-	        </snapshots>
-	    </repository>
-	    <repository>
-	        <id>central</id>
-	        <url>https://repo1.maven.org/maven2</url>
-	        <releases>
-	            <enabled>true</enabled>
-	        </releases>
-	        <snapshots>
-	            <enabled>true</enabled>
-	        </snapshots>
-	    </repository>
+		<repository>
+			<id>github-pub</id>
+			<url>https://maven.pkg.github.com/OddPrints/prodigi-java-sdk</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>central</id>
+			<url>https://repo1.maven.org/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
-   
+
 
 </project>
