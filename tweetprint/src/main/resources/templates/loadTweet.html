@@ -41,30 +41,30 @@
 	<body>
 
 	
-		<form action="addressPreview">
+		<form action="addressPreview" method="post">
 		
 			<input type="hidden" id="tweetId" name="tweetId" th:value="${tweetId}" >
 		
 			<h3>Media</h3>
-			<input type="radio" id="postcard" name="cardType" value="Post Card" checked>
+			<input type="radio" id="postcard" name="cardType" value="POST_CARD" checked>
 			<label for="postcard">Post Card</label>
-			<input type="radio" id="greetingscard" name="cardType" value="Greetings Card">
+			<input type="radio" id="greetingscard" name="cardType" value="GREETINGS_CARD">
 			<label for="greetingscard">Greetings Card</label>
 			
 			<h3>Arrangement</h3>
-			<input type="radio" id="landscape" name="arrangement" value="Landscape" checked>
+			<input type="radio" id="landscape" name="arrangement" value="LANDSCAPE" checked>
 			<label for="landscape">Landscape</label>
-			<input type="radio" id="portrait" name="arrangement" value="Portrait">
+			<input type="radio" id="portrait" name="arrangement" value="PORTRAIT">
 			<label for="portrait">Portrait</label>
 			
 			<h3>Look</h3>
-			<input type="radio" id="big" name="style" value="Big" checked>
+			<input type="radio" id="big" name="style" value="BIG" checked>
 			<label for="big">Big</label>
-			<input type="radio" id="regular" name="style" value="Regular">
+			<input type="radio" id="regular" name="style" value="REGULAR">
 			<label for="regular">Regular</label>
-			<input type="radio" id="minimal" name="style" value="Minimal">
+			<input type="radio" id="minimal" name="style" value="MINIMAL">
 			<label for="regular">Minimal</label>
-			<input type="radio" id="media" name="style" value="Media">
+			<input type="radio" id="media" name="style" value="MEDIA">
 			<label for="regular">Media</label>
 		
 			<h3>Replies</h3>
@@ -76,7 +76,7 @@
 			<input id="x" name="x" value="0">
 			<input id="y" name="y" value="0">
 			<input id="width" name="width" value="0" >
-			<input id="height" name="width" value="0" >
+			<input id="height" name="height" value="0" >
 			
 			<img id="img" 
 			th:src="@{images/noun-loading-4621975.svg}"

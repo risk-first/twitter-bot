@@ -1,0 +1,30 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+      
+      
+	<head>
+		<title>Preview Card</title>
+	</head>
+      
+	<body>
+
+		<p>Ok, It'll look something like this: </p>
+		
+		<img th:src="@{${tweetUrl}}" />
+		
+		<p>With this message inside</p>
+		
+		<img th:src="@{${messageUrl}}" />
+				
+		<form action="checkout">
+		
+			<input name="orderDetails" type="hidden" th:value="${orderDetails}" />
+			
+			<input type="submit" />
+		
+		</form>	
+	
+
+	</body>
+
+</html>

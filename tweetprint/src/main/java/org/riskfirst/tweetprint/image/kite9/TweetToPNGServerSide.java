@@ -241,6 +241,7 @@ public class TweetToPNGServerSide {
 		
 		convertToPng(adlIn, response, request.getUrl().toString());
 	}
+	
 
 	private void convertToPng(Document adlIn, HttpServletResponse response, String uri) {
 		try {
@@ -252,6 +253,21 @@ public class TweetToPNGServerSide {
 		} catch (Exception e) {
 			throw new Kite9XMLProcessingException("Couldn't convert to png", e);
 		}
+	}
+	
+	@GetMapping(produces = MediaType.IMAGE_PNG_VALUE, path="/print-quality")
+	public void printQuality(
+			HttpServletResponse response, 
+			@RequestParam(required = true, name="payload") String payload, 
+			RequestEntity<?> request) throws Exception {
+//		Tweet status = tc.getTweet(tweetId);
+//		
+//		
+//		Document adlIn = convertTweetsToAdl(Collections.singletonList(status));
+//		
+//		System.out.println(new XMLHelper().toXML(adlIn, false));
+//		
+//		convertToPng(adlIn, response, request.getUrl().toString());
 	}
 
 }
