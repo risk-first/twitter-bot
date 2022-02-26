@@ -1,4 +1,4 @@
-package org.riskfirst.tweetprint.print;
+package org.riskfirst.tweetprint.prodigi;
 
 import java.net.MalformedURLException;
 import java.net.URL;

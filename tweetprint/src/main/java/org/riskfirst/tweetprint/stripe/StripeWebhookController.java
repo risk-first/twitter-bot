@@ -1,12 +1,12 @@
-package org.riskfirst.tweetprint.order;
+package org.riskfirst.tweetprint.stripe;
 
-import static org.riskfirst.tweetprint.order.OrderController.ORDER_DETAILS_METADATA;
+import static org.riskfirst.tweetprint.stripe.OrderController.ORDER_DETAILS_METADATA;
 
 import java.io.IOException;
 import java.util.Base64;
 
 import org.riskfirst.tweetprint.flow.OrderDetails;
-import org.riskfirst.tweetprint.print.PrintService;
+import org.riskfirst.tweetprint.prodigi.PrintService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

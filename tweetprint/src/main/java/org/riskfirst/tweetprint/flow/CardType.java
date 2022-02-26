@@ -32,7 +32,7 @@ public enum CardType {
 	public int getWidthPx() {
 		switch (this) {
 		case POST_CARD: 
-			return 3588;
+			return 3588 / 2;
 		case GREETINGS_CARD:
 			return 6118; 		
 		default:
