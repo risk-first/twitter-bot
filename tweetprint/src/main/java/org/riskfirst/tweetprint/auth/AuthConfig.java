@@ -28,7 +28,9 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/webjars/**").permitAll()	// javascript dependencies
 		.antMatchers("/stylesheet.js").permitAll()	// error page
 		.antMatchers("/stylesheet.css").permitAll()	// error page
-		.antMatchers("/oauth/token").permitAll()	// oauth login
+		.antMatchers("/oauth2/**").permitAll()	// oauth login
+		.antMatchers("/login/**").permitAll()	// oauth login
+		.antMatchers("/authorized/**").permitAll()	// oauth login
 		.antMatchers("/console/**").permitAll()
 		.antMatchers("/public/**").permitAll()		// public pages/stylesheets etc.
 		.antMatchers("/command/v1").permitAll()		

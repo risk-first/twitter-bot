@@ -1,0 +1,56 @@
+spring:
+  thymeleaf:
+    cache: false
+    
+  security:
+    oauth2:
+      client:
+        registration:
+          twitter:
+            clientId: Z1QyWnowc3BVeGhTeUtRLTJaMkU6MTpjaQ
+            clientSecret: OkK0Yt9VYm0-iky7-GcUc46rAV9j0csOWw8A0qqN4SQaWS-8Ow
+            authorization-grant-type: authorization_code
+            client-authentication-method: none
+            redirect-uri: https://65bd-78-143-199-216.ngrok.io/user
+            scope: tweet.read
+        provider:
+          twitter:
+            tokenUri:  https://api.twitter.com/2/oauth2/token
+            authorizationUri: https://twitter.com/i/oauth2/authorize 
+#            user-info-uri: http://localhost:8080/user
+#            user-name-attribute: name
+
+
+#https://twitter.com/i/oauth2/authorize?
+#response_type=code&
+#client_id=Z1QyWnowc3BVeGhTeUtRLTJaMkU6MTpjaQ&
+#state=KITApDwJfM5e1ZKhVfps8xJZYfWQ-AvTqG_UqI6bkEA%3D&
+#redirect_uri=https://65bd-78-143-199-216.ngrok.io/user            
+
+#spring.security.oauth2.client.provider.xxxxxxxxx.authorization-uri=https://api.xxxxxxxxx.com/authorize
+#spring.security.oauth2.client.provider.xxxxxxxxx.token-uri=https://api.xxxxxxxxx.com/token
+#spring.security.oauth2.client.provider.xxxxxxxxx.user-info-uri=https://api.xxxxxxxxx.com/userinfo?schema=openid
+#spring.security.oauth2.client.provider.xxxxxxxxx.user-name-attribute=name
+#spring.security.oauth2.client.provider.xxxxxxxxx.user-info-authentication-method=header
+#spring.security.oauth2.client.provider.xxxxxxxxx.jwk-set-uri=https://api.xxxxxxxxx.com/jwks
+         
+       
+            
+stripe:
+  api-key: sk_test_51KRIzLDdo0JOrE5NHclyqrhlxwILCys97lSEVi0QLDQxP5Bt7VyDBtIe38rajhn2llb6tpcw9UMYIsteXBYFxQ6T00heznXUIC
+  endpoint-secret: whsec_lywzpUrGA4So0nLoLvPCXwqhHzooNeBC
+  
+tweetprint:
+  base-url:  http://robs-pro:8080
+  
+  
+twitter:
+  consumerKey: nsCYb1YTRwX5lgeh8qEX9wFl2
+  consumerSecret: nBmVtYvGrdSEhiwGkpFyd062muv8TKK1R6Png4ocPcb8QOiC02
+  accessToken: 1007885816868278272-C64Y0SOMv8zoakLh3baIoDcJZPgxcg
+  accessTokenSecret: gqlUX2YL6znJWfkAfvtW3m2Pp8WzmjyvRApinO0TlB0JO
+  
+prodigi:
+  environment: SANDBOX   # LIVE or SANDBOX
+  apiKey: b0fc4f29-5609-47c7-af81-cf9ea647689d
+  
