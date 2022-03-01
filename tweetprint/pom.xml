@@ -52,7 +52,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<!-- this is deprecated, but required for Oauth1 -->
+			<groupId>org.springframework.security.oauth</groupId>
+			<artifactId>spring-security-oauth</artifactId>
+			<version>2.5.1.RELEASE</version>	
 		</dependency>
 		<dependency>
 			<groupId>io.github.redouane59.twitter</groupId>

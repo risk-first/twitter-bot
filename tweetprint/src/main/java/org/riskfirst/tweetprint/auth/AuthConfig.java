@@ -1,31 +1,65 @@
 package org.riskfirst.tweetprint.auth;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth.common.signature.SharedConsumerSecretImpl;
+import org.springframework.security.oauth.consumer.BaseProtectedResourceDetails;
+import org.springframework.security.oauth.consumer.OAuthConsumerSupport;
+import org.springframework.security.oauth.consumer.ProtectedResourceDetails;
+import org.springframework.security.oauth.consumer.ProtectedResourceDetailsService;
+import org.springframework.security.oauth.consumer.client.CoreOAuthConsumerSupport;
+import org.springframework.security.oauth.consumer.filter.OAuthConsumerContextFilter;
+import org.springframework.security.oauth.consumer.filter.OAuthConsumerProcessingFilter;
+import org.springframework.security.oauth.consumer.token.HttpSessionBasedTokenServices;
+import org.springframework.security.oauth.consumer.token.OAuthConsumerTokenServices;
+import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
+import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import io.github.redouane59.twitter.TwitterClient;
-import io.github.redouane59.twitter.dto.user.User;
-import io.github.redouane59.twitter.dto.user.UserV2;
-import io.github.redouane59.twitter.signature.TwitterCredentials;
-
 @Configuration
 @EnableWebSecurity
+@SuppressWarnings("deprecation")
 public class AuthConfig extends WebSecurityConfigurerAdapter {
+
+	public static final String RESOURCE_NAME = "requiresLogin";
+
+	private static final class TweetPrintOauthConsumerContextFilter extends OAuthConsumerContextFilter {
+		
+		private String callbackUri;
+		
+		public TweetPrintOauthConsumerContextFilter(String callbackUri) {
+			super();
+			this.callbackUri = callbackUri;
+		}
+
+		@Override
+		protected String getCallbackURL(HttpServletRequest request) {
+			return callbackUri;
+		}
+	}
+
+	@Value("${twitter.consumerKey}") String consumerKey;
+	@Value("${twitter.consumerSecret}") String consumerSecret;
+	@Value("${spring.security.oauth.twitter.request-token-uri}") String requestTokenUri;
+	@Value("${spring.security.oauth.twitter.user-authorization-uri}") String userAuthorizationUri;
+	@Value("${spring.security.oauth.twitter.access-token-uri}") String accessTokenUri;
+	@Value("${spring.security.oauth.twitter.callback-uri}") String callbackUri;
 
 	/**
 	 * Allows access to pretty much everything.  /github endpoint is secured by oauth2 at the moment (via github).
@@ -35,41 +69,8 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable();
 		http.headers().frameOptions().disable();
 		
-		http.authorizeRequests()
-		.antMatchers("/").permitAll() 			// home page
-		.antMatchers("/webjars/**").permitAll()	// javascript dependencies
-		.antMatchers("/stylesheet.js").permitAll()	// error page
-		.antMatchers("/stylesheet.css").permitAll()	// error page
-		.antMatchers("/oauth2/**").permitAll()	// oauth login
-		.antMatchers("/login/**").permitAll()	// oauth login
-		.antMatchers("/authorized/**").permitAll()	// oauth login
-		.antMatchers("/console/**").permitAll()
-		.antMatchers("/public/**").permitAll()		// public pages/stylesheets etc.
-		.antMatchers("/command/v1").permitAll()		
-		.antMatchers("/actuator/**").permitAll()	// health/metrics
-		.antMatchers("/api/renderer").permitAll()
-		.antMatchers("/api/renderer.*").permitAll()	// used for book, other remote rendering
-		.antMatchers("/**").authenticated()
-		.and()
-		.oauth2Login(oauth2 -> oauth2.userInfoEndpoint().userService(in -> {
-			System.out.println("user in: "+in);
-			TwitterCredentials tc = TwitterCredentials.builder().bearerToken(in.getAccessToken().getTokenValue()).build();
-			TwitterClient twitter = new TwitterClient(tc);
-			Optional<UserV2> me = twitter.getRequestHelperV2().getRequest("https://api.twitter.com/2/users/me", UserV2.class);
-			
-			List<GrantedAuthority> authorities = in.getClientRegistration()
-				.getScopes().stream()
-				.map(s -> new SimpleGrantedAuthority("SCOPE_"+s))
-				.collect(Collectors.toList());
-			
-			
-			DefaultOAuth2User out = new DefaultOAuth2User(
-					authorities, 
-					Collections.singletonMap("name", me.get().getId()), "name");
-			
-			return out;
-		}));	
-		
+		http.addFilterAfter(this.oauthConsumerContextFilter(), SwitchUserFilter.class);
+		http.addFilterAfter(this.oauthConsumerProcessingFilter(), TweetPrintOauthConsumerContextFilter.class);
 		
 		http.cors().configurationSource(new CorsConfigurationSource() {
 			
@@ -83,5 +84,79 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
 		});
 		
 	} 
+    // IMPORTANT: this must not be a Bean
+	TweetPrintOauthConsumerContextFilter oauthConsumerContextFilter() {
+		TweetPrintOauthConsumerContextFilter filter = new TweetPrintOauthConsumerContextFilter(callbackUri);
+        filter.setConsumerSupport(this.consumerSupport());
+        return filter;
+    }
+
+    // IMPORTANT: this must not be a Bean
+    OAuthConsumerProcessingFilter oauthConsumerProcessingFilter() {
+        OAuthConsumerProcessingFilter filter = new OAuthConsumerProcessingFilter();
+        filter.setProtectedResourceDetailsService(this.prds());
+
+        LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> map =
+            new LinkedHashMap<>();
+
+        // one entry per oauth:url element in xml
+        map.put(
+            // 1st arg is equivalent of url:pattern in xml
+            // 2nd arg is equivalent of url:httpMethod in xml
+            new AntPathRequestMatcher("/user/**", null),
+            // arg is equivalent of url:resources in xml
+            // IMPORTANT: this must match the ids in prds() and prd() below
+            Collections.singletonList(new SecurityConfig(RESOURCE_NAME))
+        );
+
+        filter.setObjectDefinitionSource(
+            new DefaultFilterInvocationSecurityMetadataSource(map)
+        );
+
+        return filter;
+    }
+
+    @Bean
+    OAuthConsumerSupport consumerSupport() {
+        CoreOAuthConsumerSupport consumerSupport = new CoreOAuthConsumerSupport();
+        consumerSupport.setProtectedResourceDetailsService(prds());
+        return consumerSupport;
+    }
+
+    @Bean
+    ProtectedResourceDetailsService prds() {
+        return (String id) -> {
+            switch (id) {
+            // this must match the id in prd() below
+            case RESOURCE_NAME:
+                return prd();
+            }
+            throw new RuntimeException("Invalid id: " + id);
+        };
+    }
+
+    ProtectedResourceDetails prd() {
+        BaseProtectedResourceDetails details = new BaseProtectedResourceDetails();
+
+        // this must be present and match the id in prds() and prd() above
+        details.setId(RESOURCE_NAME);
+
+        details.setConsumerKey(consumerKey);
+        details.setSharedSecret(new SharedConsumerSecretImpl(consumerSecret));
+
+        details.setRequestTokenURL(requestTokenUri);
+        details.setUserAuthorizationURL(userAuthorizationUri);
+        details.setAccessTokenURL(accessTokenUri);
+        details.setUse10a(true);
+
+        // any other service-specific settings
+
+        return details;
+    }
+
+    @Bean
+    OAuthConsumerTokenServices tokenServices() {
+    	return new HttpSessionBasedTokenServices();
+    }
 }
 
