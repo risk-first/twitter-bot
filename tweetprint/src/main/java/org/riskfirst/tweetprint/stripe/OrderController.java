@@ -61,6 +61,7 @@ public class OrderController implements InitializingBean {
 			.setShippingAddressCollection(
 				ShippingAddressCollection.builder()
 					.addAllAllowedCountry(allowedCountries)
+					.putExtraParam(b64Order, od)
 				.build())
 			
 			.addShippingOption(

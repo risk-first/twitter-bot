@@ -1,0 +1,34 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+
+</head>
+<body>
+	<div th:fragment="navigation" data-collapse="medium" data-animation="default"
+		data-duration="400" data-easing="ease" data-easing2="ease"
+		role="banner" class="navigation w-nav">
+		<div class="navigation-wrap">
+			<a href="index.html" class="logo-link w-nav-brand"><img
+				src="images/Screenshot-2022-03-04-at-08.39.24.png" width="108"
+				sizes="108px"
+				srcset="images/Screenshot-2022-03-04-at-08.39.24-p-500.png 500w, images/Screenshot-2022-03-04-at-08.39.24-p-800.png 800w, images/Screenshot-2022-03-04-at-08.39.24-p-1080.png 1080w, images/Screenshot-2022-03-04-at-08.39.24.png 1494w"
+				alt="" class="logo-image"></a>
+			<div class="menu">
+				<nav role="navigation" class="navigation-items w-nav-menu">
+					<a href="/" th:classappend="${page == 'index' ? 'w--current' : ''}" class="navigation-item w-nav-link">HOME</a> 
+					<a href="/eco" th:classappend="${page == 'eco' ? 'w--current' : ''}" class="navigation-item w-nav-link">ECO</a> 
+					<a href="/earn" th:classappend="${page == 'earn' ? 'w--current' : ''}" class="navigation-item w-nav-link">EARN</a> 
+					<a href="/user" th:classappend="${page == 'user' ? 'w--current' : ''}" class="navigation-item w-nav-link">TWITTER LOGIN</a>
+				</nav>
+				<div class="menu-button w-nav-button">
+					<img src="images/menu-icon_1menu-icon.png" width="22" alt=""
+						class="menu-icon">
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+</body>
+
+</html>
