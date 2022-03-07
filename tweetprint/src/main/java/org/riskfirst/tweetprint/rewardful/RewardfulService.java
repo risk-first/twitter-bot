@@ -49,12 +49,18 @@ public class RewardfulService {
 	}
 
 	private Optional<Affiliate> findAffiliateInCache(String twitterScreenName) {
-		return affiliateCache.stream()
+		String converted = convertScreenNameToAffiliateToken(twitterScreenName);
+		Optional<Affiliate> out = affiliateCache.stream()
 			.filter(a -> a.links.stream()
-				.filter(l -> l.url.endsWith("/"+twitterScreenName))
+				.filter(l -> l.url.endsWith("via="+converted))
 				.findAny()
 				.isPresent())
 			.findFirst();
+		return out;
+	}
+
+	private String convertScreenNameToAffiliateToken(String twitterScreenName) {
+		return twitterScreenName.replace("_", "-");
 	}
 
 	public Set<Affiliate> getAffiliates() {
@@ -66,17 +72,19 @@ public class RewardfulService {
 		int page = (int) Math.floor((double) affiliateCache.size() / (double) RESULTS_PER_PAGE);
 		Paginated<Affiliate> returnedData;
 		do {
-			returnedData = api.getAffiliates(page, RESULTS_PER_PAGE, Arrays.asList("links", "commission_stats"));
+			returnedData = api.getAffiliates(page, RESULTS_PER_PAGE, "links");
 			affiliateCache.addAll(returnedData.data);
-			if (returnedData.pagination.totalPages >= page) {
+			if (returnedData.pagination.totalPages > page+1) {
 				page++;
-			}			
+			} else {
+				page = -1;
+			}
 		} while (page > -1);
 	}
 	
 	
 	public Affiliate create(String firstName,String lastName,String email,String twitterScreenName) {
-		Affiliate out = api.create(firstName, lastName, email, twitterScreenName);
+		Affiliate out = api.create(firstName, lastName, email, convertScreenNameToAffiliateToken(twitterScreenName));
 		affiliateCache.add(out);
 		return out;
 	}

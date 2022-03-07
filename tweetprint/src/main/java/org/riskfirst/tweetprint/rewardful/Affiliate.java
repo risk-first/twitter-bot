@@ -3,6 +3,7 @@ package org.riskfirst.tweetprint.rewardful;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -10,9 +11,15 @@ public class Affiliate {
 	
 	public String id;
 	public String email;
+	
+	@JsonAlias("first_name")	
 	public String firstName;
+
+	@JsonAlias("last_name")	
 	public String lastName;
+	
 	public long conversions;
+	
 	public List<Link> links;
 	
 	@Override

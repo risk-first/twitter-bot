@@ -2,6 +2,7 @@ package org.riskfirst.tweetprint.rewardful;
 
 import java.util.List;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -18,7 +19,7 @@ public interface RewardfulApi {
 	public Paginated<Affiliate> getAffiliates(
 		@QueryParam("page") long page,
 		@QueryParam("limit") int limit,
-		@QueryParam("expand") List<String> expand);
+		@QueryParam("expand") String expand);
 	
 	@GET
 	@Path("/v1/affiliates/{id}/sso")
@@ -29,9 +30,9 @@ public interface RewardfulApi {
 	@Path("/v1/affiliates")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Affiliate create(
-			@QueryParam("first_name") String firstName,
-			@QueryParam("last_name") String lastName,
-			@QueryParam("email") String email,
-			@QueryParam("token") String screenName);
+			@FormParam("first_name") String firstName,
+			@FormParam("last_name") String lastName,
+			@FormParam("email") String email,
+			@FormParam("token") String screenName);
 	
 }

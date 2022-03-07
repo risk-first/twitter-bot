@@ -7,7 +7,6 @@
   <div th:replace="fragments/navigation :: navigation" />
   <div class="wf-section">
     <div class="w-container">
-      <h1><span th:text="${user.name}">Username</span>&#x27;s Account</h1>
       <div class="w-row">
         <div class="w-col w-col-4 twitter-profile">
           <img th:src="${#strings.replace(user.profileImageUrl, 'normal','400x400')}" loading="lazy" alt="">
@@ -17,7 +16,10 @@
         <div class="w-col w-col-8">
           <div th:switch="${hasAccount}">
             <div th:case="${false}" class="w-form">
-              <form method="post" name="newAccountForm"
+              <h1>Welcome, <span th:text="${user.name}">Username</span></h1>
+              <p>Looks like you're new to TweetPrint.   Please fill out the form below and we'll create your rewardful account and 
+              provide you a login link so that you can login to its payment portal.</p>
+              <form method="post" name="newAccount" action="newAccount"
                 id="newAccountForm"
                 aria-label="New Account Form">
                 
@@ -34,16 +36,18 @@
                   type="text" id="name-2">
                 <label for="email">Email
                   Address</label>
+
                 <input class="w-input" maxlength="256"
-                  name="email"  placeholder=""
-                  type="email" id="email" required="true"><input
+                  name="email"  placeholder="someone@somewhere.com"
+                  type="email" id="email" required="true">
+                 
+                <input
                   type="submit" 
                   class="w-button" value="Create Rewardful Account">
               </form>
             </div>
-          </div>
-          <div>
             <div th:case="${true}" class="w-form">
+              <h1><span th:text="${user.name}">Username</span>&#x27;s Account</h1>
               <form id="email-form" name="email-form" method="get"
                 class="form">
                 <label class="w-checkbox">
@@ -68,7 +72,7 @@
       </div>
     </div>
   </div>
-  <div class="section-2 wf-section">
+  <div class="section-2 wf-section" th:if="${hasAccount}">
     <div class="w-container">
       <h2>Tell Your Followers!</h2>
       <div>You&#x27;re more likely to get people printing your tweets if you let them know they can! <br><br>Use the buttons below (sparingly) to reply on some of your recent tweets with a PrintTweet link.<br>‍</div>
