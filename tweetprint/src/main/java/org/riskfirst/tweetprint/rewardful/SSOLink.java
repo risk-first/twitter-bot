@@ -4,8 +4,8 @@ public class SSOLink {
 
 	public static class SSO {
 		
-		String url;
-		String expires;
+		public String url;
+		public String expires;
 		
 	}
 

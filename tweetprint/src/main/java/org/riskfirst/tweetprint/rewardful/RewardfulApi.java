@@ -1,7 +1,5 @@
 package org.riskfirst.tweetprint.rewardful;
 
-import java.util.List;
-
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;

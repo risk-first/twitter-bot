@@ -50,10 +50,11 @@ public class UserController {
 			.addObject("page", "user")
 			.addObject("preferences", preferences)
 			.addObject("hasAccount", hasAccount)
+			.addObject("title", "Account Page")
 			.addObject("affiliate", affiliate.orElseGet(() -> null));
     }
     
-    @PostMapping("newAccount")
+    @PostMapping("/user/newAccount")
     public RedirectView newAccount(
     		@RequestParam("firstName") String firstName,
     		@RequestParam("lastName") String lastName,
@@ -64,6 +65,8 @@ public class UserController {
 			Affiliate a = rewardful.create(firstName, lastName, email, me.get().getName());
 			
 			if (a!= null) {
+				Preferences defaultPrefs = new Preferences(true, false);
+				prefs.setPreferences(me.get().getId(), defaultPrefs);
 				return new RedirectView("/user");
 			} else {
 				throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "Affiliate wasn't created");
@@ -72,9 +75,43 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "Couldn't create affiliate", e);
 		}
     }
+    
+    @GetMapping("/user/update")
+    public RedirectView updateAccount(
+    		@RequestParam(name="allow", defaultValue = "false") boolean allow,
+    		@RequestParam(name="charity", defaultValue="false") boolean charity) {
     	
-    
-    
+    	try {
+			Optional<UserV2> me = lookupAuthenticatedTwitterUser();
+			
+			if (me.isPresent()) {
+				prefs.setPreferences(me.get().getId(), new Preferences(allow, charity));
+				return new RedirectView("/user");
+			} else {
+				throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "Couldn't redirect: User not logged in?");
+			}
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "Couldn't update user preferences", e);
+		}
+
+    }
+    	
+    @GetMapping("/user/openRewardful")
+    public RedirectView openRewardfulInNewTab() {
+		Optional<UserV2> me = lookupAuthenticatedTwitterUser();
+		if (me.isPresent()) {
+			Optional<Affiliate> a = rewardful.getAffiliate(me.get().getName());
+			if (a.isPresent()) {
+				String link = rewardful.getAffiliateLink(me.get().getName());
+				return new RedirectView(link);
+			} else {
+				throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "Couldn't redirect: No rewardful account for "+me.get().getName());
+			}				
+		} else {
+			throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "Couldn't redirect: User not logged in?");
+		}
+		
+    }
     
 	protected Optional<UserV2> lookupAuthenticatedTwitterUser() {
 		OAuthConsumerToken token = tokenServices.getToken(AuthConfig.RESOURCE_NAME);

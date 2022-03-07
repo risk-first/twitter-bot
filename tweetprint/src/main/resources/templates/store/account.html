@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:insert="fragments/common-head  :: head">
-  <title>Account Page</title>
-</head>
+<head th:replace="fragments/common-head  :: head"></head>
 <body>
   <div th:replace="fragments/navigation :: navigation" />
   <div class="wf-section">
     <div class="w-container">
+      <h2>Account Settings</h2>
       <div class="w-row">
-        <div class="w-col w-col-4 twitter-profile">
+        <div class="w-col w-col-1 twitter-profile">
           <img th:src="${#strings.replace(user.profileImageUrl, 'normal','400x400')}" loading="lazy" alt="">
-          <p class="display-name" th:text="${user.displayedName}">Some Name</p>
-          <p class="screen-name"><a th:href="${user.url}" th:text="${'@' + user.name}">@user</a></p>
         </div>
-        <div class="w-col w-col-8">
+        <div class="w-col w-col-11">
+          <p class="display-name" th:text="${user.displayedName}">Some Name</p>
+          <p class="screen-name" th:text="${'@' + user.name}">@user</p>
+          <hr />
           <div th:switch="${hasAccount}">
             <div th:case="${false}" class="w-form">
-              <h1>Welcome, <span th:text="${user.name}">Username</span></h1>
               <p>Looks like you're new to TweetPrint.   Please fill out the form below and we'll create your rewardful account and 
               provide you a login link so that you can login to its payment portal.</p>
-              <form method="post" name="newAccount" action="newAccount"
+              <form method="post" name="newAccount" action="user/newAccount"
                 id="newAccountForm"
                 aria-label="New Account Form">
                 
@@ -29,14 +28,14 @@
                   placeholder="Your First Name"  required="true"
                   type="text" id="firstName">
                   
-                <label for="name-3">LAST&nbsp;NAME</label>
+                <label for="lastName">LAST&nbsp;NAME</label>
                 <input
                   class="w-input" maxlength="256" name="lastName"
                   placeholder="Your Last Name"  required="true"
                   type="text" id="name-2">
+                  
                 <label for="email">Email
                   Address</label>
-
                 <input class="w-input" maxlength="256"
                   name="email"  placeholder="someone@somewhere.com"
                   type="email" id="email" required="true">
@@ -47,24 +46,24 @@
               </form>
             </div>
             <div th:case="${true}" class="w-form">
-              <h1><span th:text="${user.name}">Username</span>&#x27;s Account</h1>
-              <form id="email-form" name="email-form" method="get"
-                class="form">
-                <label class="w-checkbox">
-                  <input type="checkbox"
-                    name="checkbox" id="checkbox"
-                    class="w-checkbox-input checkbox">
-                  <span
-                    class="w-form-label" for="checkbox">Checkbox</span>
-                </label>
+              <form id="email-form" name="email-form" method="post"
+                class="form" action="user/update">
                 
-                <label class="w-checkbox">
+                <div class="inputGroup">
+                  <input type="checkbox" th:checked="${preferences.permissionGiven}"
+                      name="allow" id="allow"
+                      class="w-checkbox-input checkbox" onclick="updateUser()">
+                  <label class="w-checkbox" for="allow">Allow TweetPrint To Use My Tweets</label>
+                </div>
+                
+                <div class="inputGroup">
                 <input type="checkbox"
-                  name="checkbox-2" id="checkbox-2"
-                  class="w-checkbox-input"><span
-                  class="w-form-label" for="checkbox-2">Checkbox2</span></label>
-                    
-                <input type="submit" value="Visit Your Rewardful Account" class="w-button">
+                  name="charity" id=charity th:checked="${preferences.donateToCharity}"
+                  class="w-checkbox-input" onclick="updateUser()">
+                 <label class="w-checkbox" for="charity">Donate Proceeds To <a href="/eco" style="display: inline; ">Good Causes</a></label>
+                </div>
+                             
+                <a href="/user/openRewardful">Visit Your Rewardful Account</a>  
               </form>
             </div>
           </div>
@@ -98,5 +97,16 @@
     </div>
   </div>
   <div class="section" th:replace="fragments/footer :: footer" />
+  <script type="text/javascript" th:inline="javascript">
+    function updateUser() {
+    	const charity = document.getElementById("charity").checked;
+    	const allow = document.getElementById("allow").checked;
+    	if ((!allow) && (charity)) {
+    		document.getElementById("charity").checked = false;
+    	}
+    	const url = "[(@{/user/update})]"
+    	fetch(url+"?charity="+charity+"&allow="+allow);
+    }
+  </script>
 </body>
 </html>

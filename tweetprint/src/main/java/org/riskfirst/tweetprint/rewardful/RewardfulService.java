@@ -2,7 +2,6 @@ package org.riskfirst.tweetprint.rewardful;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;

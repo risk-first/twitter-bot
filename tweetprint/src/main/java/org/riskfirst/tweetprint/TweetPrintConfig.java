@@ -25,7 +25,7 @@ public class TweetPrintConfig implements InitializingBean {
 	@Bean
 	public UserPreferencesService userPreferencesService(
 			TwitterClient tc,
-			@Value("${tweet-print.charity-list:0}") long charityListId) {
+			@Value("${tweet-print.charity-list:0}") String charityListId) {
 		return new UserPreferencesService(tc, charityListId);
 	}
 	
