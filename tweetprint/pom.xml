@@ -55,6 +55,10 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jersey</artifactId>
+		</dependency> 
+		<dependency>
 			<!-- this is deprecated, but required for Oauth1 -->
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth</artifactId>
@@ -76,6 +80,14 @@
 			<groupId>org.webjars.npm</groupId>
 			<artifactId>stripe</artifactId>
 			<version>8.157.0</version>
+		</dependency>
+	<!--<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+		</dependency> -->
+		<dependency>
+			<groupId>org.glassfish.jersey.ext</groupId>
+			<artifactId>jersey-proxy-client</artifactId>
 		</dependency>
 
 		<!-- printing -->
