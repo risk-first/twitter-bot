@@ -1,4 +1,4 @@
-package org.riskfirst.tweetprint.flow;
+package org.riskfirst.tweetprint.builder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
@@ -7,18 +7,15 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 public class OrderDetails {
 	
 	public long tweetId;
-	public CardType cardType;
-	public Style style;
-	public Arrangement arrangement;
-	public boolean responseTweet;
-	public String message;
-	public long x;
-	public long y;
-	public long width;
-	public long height;
+	public CardType cardType = CardType.POST_CARD;
+	public Style style = Style.BIG;
+	public Arrangement arrangement = Arrangement.PORTRAIT;
+	public boolean responseTweet = true;
+	public String message = "Dear Fred,\n\nHope you are well.\n\nWeather awful.\n\nWish you were here.\n\nLove Jim";
+	public Font font = Font.SANS;
 	
 	public OrderDetails(long tweetId, CardType cardType, Style style, Arrangement arrangement, boolean responseTweet,
-			String message, long x, long y, long width, long height) {
+			String message, Font font) {
 		super();
 		this.tweetId = tweetId;
 		this.cardType = cardType;
@@ -26,10 +23,7 @@ public class OrderDetails {
 		this.arrangement = arrangement;
 		this.responseTweet = responseTweet;
 		this.message = message;
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
+		this.font = font;
 	}
 
 	public OrderDetails() {

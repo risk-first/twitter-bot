@@ -105,7 +105,11 @@
     		document.getElementById("charity").checked = false;
     	}
     	const url = "[(@{/user/update})]"
-    	fetch(url+"?charity="+charity+"&allow="+allow);
+    	fetch(url+"?charity="+charity+"&allow="+allow)
+    		.then(response => {
+              if (!response.ok) {
+                  alert("Please reload the page");
+              }})
     }
   </script>
 </body>

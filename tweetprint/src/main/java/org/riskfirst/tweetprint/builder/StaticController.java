@@ -1,4 +1,4 @@
-package org.riskfirst.tweetprint.flow;
+package org.riskfirst.tweetprint.builder;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

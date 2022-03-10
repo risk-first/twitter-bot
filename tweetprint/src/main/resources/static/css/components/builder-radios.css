@@ -1,0 +1,37 @@
+.typeradio{
+  display: inline-flex;
+  background: #fff;
+  width: 100%;
+  align-items: center;
+  justify-content: space-evenly;
+  border-radius: 5px;
+  padding: 20px 15px;
+}
+
+.typeradio .option {
+  background: #fff;
+  height: 100px;
+  width: 150px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin: 0 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0 10px;
+  border: 2px solid lightgrey;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.typeradio input[type="radio"]{
+  display: none;
+}
+
+.typeradio input:checked + label {
+  border-color: #0069d9;
+  background: #0069d9AA;
+  color: #fff;
+}
+

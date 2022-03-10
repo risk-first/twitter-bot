@@ -5,7 +5,7 @@ import static org.riskfirst.tweetprint.stripe.OrderController.ORDER_DETAILS_META
 import java.io.IOException;
 import java.util.Base64;
 
-import org.riskfirst.tweetprint.flow.OrderDetails;
+import org.riskfirst.tweetprint.builder.OrderDetails;
 import org.riskfirst.tweetprint.prodigi.PrintService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

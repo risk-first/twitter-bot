@@ -4,7 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 
-import org.riskfirst.tweetprint.flow.OrderDetails;
+import org.riskfirst.tweetprint.builder.OrderDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -55,7 +55,7 @@ public class PrintService implements InitializingBean {
 		
 		// Create Order
 		Order order = new Order.Builder(Order.ShippingMethod.Standard, prodigiRecipient)
-		        .addImage(u, od.cardType.getProdigiSku(), 1)
+		        .addImage(u, od.cardType.sku, 1)
 		        .build();
 		
 		order.getItems().get(0).setAttributes(Collections.emptyMap());

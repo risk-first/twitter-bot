@@ -1,4 +1,4 @@
-package org.riskfirst.tweetprint.flow;
+package org.riskfirst.tweetprint.builder;
 
 import java.util.Base64;
 
@@ -10,12 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @Controller
-public class FlowController {
+public class BuilderController {
 
 	ObjectMapper om = new ObjectMapper();
 	
@@ -23,8 +22,10 @@ public class FlowController {
 	@GetMapping("/loadTweet")
 	public ModelAndView loadTweet(@RequestParam("url") String url) {
 		long tweetId = extractTweetId(url);
-		ModelAndView out = new ModelAndView("loadTweet");
-		out.addObject("tweetId", tweetId);
+		OrderDetails order = new OrderDetails();
+		order.tweetId = tweetId;
+		ModelAndView out = new ModelAndView("builder/format");
+		out.addObject("order", order);
 		
 		if (tweetId < 0) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -39,14 +40,11 @@ public class FlowController {
 			@RequestParam("tweetId") long tweetId,
 			@RequestParam("cardType") CardType cardType,
 			@RequestParam("style") Style style,
+			@RequestParam("font") Font font,
 			@RequestParam("arrangement") Arrangement arrangement,
 			@RequestParam(required = false, name="response") boolean responseTweet,
-			@RequestParam("message") String message,
-			@RequestParam("x") long x,
-			@RequestParam("y") long y,
-			@RequestParam("width") long width,
-			@RequestParam("height") long height) throws Exception {
-		OrderDetails od = new OrderDetails(tweetId, cardType, style, arrangement, responseTweet, message, x, y, width, height);
+			@RequestParam("message") String message) throws Exception {
+		OrderDetails od = new OrderDetails(tweetId, cardType, style, arrangement, responseTweet, message, font);
 		ModelAndView out = new ModelAndView("preview");
 		out.addObject("tweetUrl", "http://robs-pro:8080/render-png?tweetId=1496845845404479490");
 		String base64 = Base64.getEncoder().encodeToString(om.writeValueAsBytes(od));

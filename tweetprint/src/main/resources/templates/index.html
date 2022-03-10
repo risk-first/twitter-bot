@@ -13,13 +13,11 @@
             <div class="heading-jumbo">Print Yo Tweets!</div>
             <div class="paragraph-bigger cc-bigger-white-light"><br></div>
             <div class="w-form">
-              <form id="email-form" name="email-form" data-name="Email Form" method="get"><label for="tweetUrl">Drop A TWEET URL</label><input type="text" class="w-input" maxlength="256" name="tweetUrl" data-name="tweetUrl" placeholder="https://twitter.com/vlad_mihalcea/status/1498655554671202317" id="tweetUrl" required=""><input type="submit" value="Show Me" data-wait="Please wait..." class="w-button"></form>
-              <div class="w-form-done">
-                <div>Thank you! Your submission has been received!</div>
-              </div>
-              <div class="w-form-fail">
-                <div>Oops! Something went wrong while submitting the form.</div>
-              </div>
+              <form id="email-form" name="email-form" data-name="Email Form" method="get" action="loadTweet">
+                <label for="tweetUrl">DROP A TWEET URL</label>
+                <input type="text" class="w-input" maxlength="256" name="url" placeholder="https://twitter.com/vlad_mihalcea/status/1498655554671202317" id="tweetUrl" required="">
+                <input type="submit" value="Show Me" data-wait="Please wait..." class="w-button">
+              </form>
             </div>
           </div>
           <h1>Send a tweet to a friend... as a postcard or a birthday card!</h1>
