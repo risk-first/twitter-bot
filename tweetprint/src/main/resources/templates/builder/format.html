@@ -8,9 +8,9 @@
         padding: 40px;
       }
     
-      #preview-image {
+      #preview-image,
+      #message-preview-image {
         margin: auto;
-        width: 80%;
         box-shadow: 0 0 19px 0px rgba(0,0,0,0.61);
       }
       
@@ -20,7 +20,8 @@
         box-shadow: 0 0 19px 0px rgba(0,0,0,0.61);
       }
       
-      #loading {
+      #loading1,
+      #loading2 {
         margin: auto;
         width: 50px;
         height: 50px;
@@ -38,17 +39,16 @@
   <div class="wf-section">
     <div class="w-container">
       <div class="w-form">
-        <form id="wf-form-layout" name="wf-form-layout" method="post" action="addressPreview">
+        <form id="wf-form-layout" name="wf-form-layout" method="post" action="preview">
         
           <input type="hidden" id="tweetId" name="tweetId" th:value="${order.tweetId}" />
         
-          <h3 class="heading-11">Choose </h3>
-          <div class="div-block-4"><label class="w-radio">
+          <h3 class="heading-11">Picture </h3>
           
          <div class="typeradio">
             <div th:each="type,i : ${T(org.riskfirst.tweetprint.builder.CardType).values()}">
                <input type="radio" name="type" th:id="${'option-'+type}" th:checked="${order.cardType == type}" th:value="${type}">
-               <label th:for="${'option-'+type}" class="option" th:classappend="${'option-'+i.index}" onpointerup="loadPreview()">
+               <label th:for="${'option-'+type}" class="option" th:classappend="${'option-'+i.index}" onpointerup="loadPreview(); changeFont();">
                 <img th:src="@{${'/images/builder/'+type.image}}" height="30"/>
                 <span th:text="${type.text}">Option</span>
                </label>
@@ -74,9 +74,8 @@
             </div>
           </div>  
         
-          <h3 class="heading-11">Arrange </h3>
           <div class="crop-block" id="crop-container">
-              <img id="loading" th:src="@{/images/builder/spinny-load.gif}" />  
+              <img id="loading1" th:src="@{/images/builder/spinny-load.gif}" />  
           </div>
           
           <h3 class="heading-12">Message </h3>
@@ -95,15 +94,12 @@
                 th:text="${order.message}" class="textarea w-input"></textarea>
           </div>
           
+          <div class="crop-block" id="message-preview-container">
+              <img id="loading2" th:src="@{/images/builder/spinny-load.gif}" />  
+          </div>
               
           <div class="div-block-3"><input type="submit" value="PREVIEW" data-wait="Please wait..." class="submit-button w-button"></div>
         </form>
-        <div class="w-form-done">
-          <div>Thank you! Your submission has been received!</div>
-        </div>
-        <div class="w-form-fail">
-          <div>Oops! Something went wrong while submitting the form.</div>
-        </div>
       </div>
     </div>
   </div>
@@ -111,7 +107,7 @@
   <script type="text/javascript">
   	function loadPreview() {
   		setTimeout(() => {
-    		const loadingIndicator = document.getElementById("loading");
+    		const loadingIndicator = document.getElementById("loading1");
     		loadingIndicator.style.display = "block";
     		
     		const tweetId = document.getElementById("tweetId").value
@@ -145,9 +141,32 @@
   	function changeFont() {
   		setTimeout(() => {
     		const font = document.querySelector('input[name="font"]:checked');
+    		const type = document.querySelector('input[name="type"]:checked');
     		const message = document.getElementById("message");
-    		const newImage = document.createElement("img");
+    		const cropContainer = document.getElementById("message-preview-container");
+    		
+    		// change on-screen font (?)
     		message.style.fontFamily = font.getAttribute("data-family");
+    		
+    		const loadingIndicator = document.getElementById("loading2");
+    		loadingIndicator.style.display = "block";
+    		
+    		
+    		document.querySelectorAll("#message-preview-image").forEach(i => cropContainer.removeChild(i));
+  
+    		const newImage = document.createElement("img");
+    		newImage.setAttribute("id", "message-preview-image");
+    		newImage.onload = function() {
+    			cropContainer.appendChild(newImage);
+    	  		loadingIndicator.style.display = "none";
+    		}
+    		
+    		const url = '/message-preview.png?message='+encodeURIComponent(message.value)
+    			+"&font="+font.value
+    			+"&type="+type.value;
+    		
+    		
+    		newImage.src = url;
     		
     	}, 10);
   		

@@ -1,5 +1,6 @@
 @import "components/cool-checkboxes.css";
 @import "components/builder-radios.css";
+@import "components/builder-previews.css";
 
 .twitter-profile img {
   border-radius: 50%;

@@ -22,6 +22,8 @@ import org.apache.batik.constants.XMLConstants;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.kite9.diagram.dom.ns.Kite9Namespaces;
+import org.riskfirst.tweetprint.builder.CardType;
+import org.riskfirst.tweetprint.builder.Font;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -41,6 +43,28 @@ public class ADLTweetBuilder {
 	private static double round(double value, int precision) {
 	    int scale = (int) Math.pow(10, precision);
 	    return (double) Math.round(value * scale) / scale;
+	}
+	
+	public Document convertMessageToAdl(String message, String address, Font f, CardType ct) throws Exception {
+		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		Document d = db.newDocument();
+		Element diagram = d.createElementNS(ADL_NAMESPACE, "diagram");
+		diagram.setAttributeNS(XSL_TEMPLATE_NAMESPACE, "xslt:template", "/public/templates/tweet/tweet-template.xsl");
+		
+		Element frame = d.createElementNS(ADL_NAMESPACE, ct.name().toLowerCase());
+		diagram.appendChild(frame);
+
+		Element messageElement = convertEmojis(frame, "message", message);
+		messageElement.setAttribute("style","font-family: "+f.text);
+		
+		if (ct == CardType.POSTCARD) {
+			convertEmojis(frame, "address", address);
+		}
+		
+		d.appendChild(diagram);
+
+		
+		return d;
 	}
 
 	public Document convertTweetsToAdl(List<Tweet> tweets) throws Exception { 
@@ -70,7 +94,7 @@ public class ADLTweetBuilder {
 		
 		tweet.setAttribute("href", status.getUser().getProfileImageUrl());
 		convertEmojis(tweet, "displayName", status.getUser().getDisplayedName());
-		convertEmojis(tweet, "screenName", status.getUser().getName());
+		convertEmojis(tweet, "screenName", "@"+status.getUser().getName());
 		tweet.setAttribute("date", convertDateShort(status.getCreatedAt()));
 		tweet.setAttribute("longDate", convertDateLong(status.getCreatedAt()));
 		tweet.setAttribute("likes", convertSocialCount(status.getLikeCount()));
