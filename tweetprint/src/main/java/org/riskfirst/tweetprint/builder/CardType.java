@@ -1,14 +1,14 @@
 package org.riskfirst.tweetprint.builder;
 
-import static org.riskfirst.tweetprint.builder.compositing.CompositeFunction.POSTCARD_CF;
-
-import org.riskfirst.tweetprint.builder.compositing.CompositeFunction;
+import org.riskfirst.tweetprint.image.CompositeFunction;
+import org.riskfirst.tweetprint.image.compositing.GreetingsCardCompositeFunction;
+import org.riskfirst.tweetprint.image.compositing.PostCardCompositeFunction;
 
 public enum CardType {
 	
 
-	POSTCARD("CLASSIC-POST-GLOS-6X4", 6f/4f, "noun-postcard-1130482.svg", "Post Card", 3588 / 2, 1287, POSTCARD_CF), 
-	GREETINGSCARD("GLOBAL-GRE-MOH-7X5-DIR", 7f/5f, "noun-greeting-card-4384989.svg", "Greetings Card", 2161, 6118/4, null);
+	POSTCARD("CLASSIC-POST-GLOS-6X4", 6f/4f, "noun-postcard-1130482.svg", "Post Card", 3588 / 2, 1287, PostCardCompositeFunction.INSTANCE), 
+	GREETINGSCARD("GLOBAL-GRE-MOH-7X5-DIR", 7f/5f, "noun-greeting-card-4384989.svg", "Greetings Card", 2161, 6118/4, GreetingsCardCompositeFunction.INSTANCE);
 	
 	public final String sku;
 	public final float ratio;
