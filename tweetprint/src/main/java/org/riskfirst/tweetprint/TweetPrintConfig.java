@@ -5,6 +5,10 @@ import java.net.URISyntaxException;
 import org.kite9.diagram.logging.Kite9Log;
 import org.kite9.diagram.logging.Kite9LogImpl;
 import org.riskfirst.tweetprint.auth.UserPreferencesService;
+import org.riskfirst.tweetprint.image.ADLTweetBuilder;
+import org.riskfirst.tweetprint.image.EmojiToMarkupParser;
+import org.riskfirst.tweetprint.image.ImageBuilder;
+import org.riskfirst.tweetprint.image.Kite9ImageBuilder;
 import org.riskfirst.tweetprint.rewardful.RewardfulService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,4 +55,17 @@ public class TweetPrintConfig implements InitializingBean {
 				.apiSecretKey(consumerSecret).build());
 	}
 	
+	@Bean
+	public ADLTweetBuilder adlTweetBuilder() {
+		return new ADLTweetBuilder();
+	}
+	
+	@Bean
+	public ImageBuilder imageBuilder(
+			TwitterClient tc, 
+			ADLTweetBuilder tb,
+			@Value("${tweetprint.base-url}") String baseUrl) {
+		return new Kite9ImageBuilder(tc, tb, baseUrl);
+		
+	}
 }

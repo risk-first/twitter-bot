@@ -15,7 +15,7 @@
   <div class="wf-section">
     <div class="w-container">
       <div class="w-form">
-        <form id="wf-form-layout" name="wf-form-layout" method="post" action="confirm">
+        <form id="wf-form-layout" name="wf-form-layout" method="get" action="@{${'/confirm/'+data}}">
         
           <input type="hidden" id="tweetId" name="tweetId" th:value="${order.tweetId}" />
         

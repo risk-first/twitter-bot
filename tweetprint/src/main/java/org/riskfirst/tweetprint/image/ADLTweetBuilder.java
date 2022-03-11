@@ -11,7 +11,6 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -45,45 +44,53 @@ public class ADLTweetBuilder {
 	    return (double) Math.round(value * scale) / scale;
 	}
 	
-	public Document convertMessageToAdl(String message, String address, Font f, CardType ct) throws Exception {
-		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document d = db.newDocument();
-		Element diagram = d.createElementNS(ADL_NAMESPACE, "diagram");
-		diagram.setAttributeNS(XSL_TEMPLATE_NAMESPACE, "xslt:template", "/public/templates/tweet/tweet-template.xsl");
-		
-		Element frame = d.createElementNS(ADL_NAMESPACE, ct.name().toLowerCase());
-		diagram.appendChild(frame);
+	public Document convertMessageToAdl(String message, String address, Font f, CardType ct) throws RuntimeException {
+		try {
+			DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document d = db.newDocument();
+			Element diagram = d.createElementNS(ADL_NAMESPACE, "diagram");
+			diagram.setAttributeNS(XSL_TEMPLATE_NAMESPACE, "xslt:template", "/public/templates/tweet/tweet-template.xsl");
+			
+			Element frame = d.createElementNS(ADL_NAMESPACE, ct.name().toLowerCase());
+			diagram.appendChild(frame);
 
-		Element messageElement = convertEmojis(frame, "message", message);
-		messageElement.setAttribute("style","font-family: "+f.text);
-		
-		if (ct == CardType.POSTCARD) {
-			convertEmojis(frame, "address", address);
+			Element messageElement = convertEmojis(frame, "message", message);
+			messageElement.setAttribute("style","font-family: "+f.text);
+			
+			if (ct == CardType.POSTCARD) {
+				convertEmojis(frame, "address", address);
+			}
+			
+			d.appendChild(diagram);
+
+			
+			return d;
+		} catch (Exception e) {
+			throw new RuntimeException("Couldn't create XML Representation of Message", e);
 		}
-		
-		d.appendChild(diagram);
-
-		
-		return d;
 	}
 
-	public Document convertTweetsToAdl(List<Tweet> tweets) throws Exception { 
-		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document d = db.newDocument();
-		Element diagram = d.createElementNS(ADL_NAMESPACE, "diagram");
-		diagram.setAttributeNS(XSL_TEMPLATE_NAMESPACE, "xslt:template", "/public/templates/tweet/tweet-template.xsl");
-		diagram.setAttributeNS(Kite9Namespaces.SVG_NAMESPACE, "svg:version", "1.0");
-		
-		Element frame = d.createElementNS(ADL_NAMESPACE, "frame");
-		diagram.appendChild(frame);
-		
-		IntStream.range(0, tweets.size())
-			.mapToObj(i -> convertTweet(tweets.get(i), i == tweets.size() - 1, d))
-			.forEach(t -> frame.appendChild(t));
-		
-		d.appendChild(diagram);
-		
-		return d;
+	public Document convertTweetsToAdl(List<Tweet> tweets) throws RuntimeException { 
+		try {
+			DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document d = db.newDocument();
+			Element diagram = d.createElementNS(ADL_NAMESPACE, "diagram");
+			diagram.setAttributeNS(XSL_TEMPLATE_NAMESPACE, "xslt:template", "/public/templates/tweet/tweet-template.xsl");
+			diagram.setAttributeNS(Kite9Namespaces.SVG_NAMESPACE, "svg:version", "1.0");
+			
+			Element frame = d.createElementNS(ADL_NAMESPACE, "frame");
+			diagram.appendChild(frame);
+			
+			IntStream.range(0, tweets.size())
+				.mapToObj(i -> convertTweet(tweets.get(i), i == tweets.size() - 1, d))
+				.forEach(t -> frame.appendChild(t));
+			
+			d.appendChild(diagram);
+			
+			return d;
+		} catch (Exception e) {
+			throw new RuntimeException("Couldn't create XML Representation of Tweet", e);
+		}
 	}
 
 	private Element convertTweet(Tweet status, boolean isLast, Document d) {
@@ -144,7 +151,7 @@ public class ADLTweetBuilder {
 	}
 
 	private void addEntities(Tweet status, Document d, Element tweet, Element textarea) {
-		if (status.getEntities() != null) {
+		if ((status.getEntities() != null) && (status.getEntities().getUrls() != null)) {
 			for (UrlEntity me : status.getEntities().getUrls()) {
 				UrlEntityV2 mev2 = (UrlEntityV2) me;
 				
